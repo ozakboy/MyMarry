@@ -24,6 +24,9 @@ FROM node:22-alpine AS backend
 
 WORKDIR /app
 
+# 建立 package.json 並標記為 ES Module
+RUN echo '{"type":"module"}' > package.json
+
 # 安裝生產環境依賴
 RUN npm install express@5.2.1 cors@2.8.5
 
