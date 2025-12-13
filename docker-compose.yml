@@ -9,17 +9,17 @@ services:
     container_name: marry-backend
     restart: unless-stopped
     ports:
-      - "4500:4500"
+      - "4600:4600"
     volumes:
       # 將資料持久化到主機
       - ./data:/app/data
     environment:
-      - PORT=4500
+      - PORT=4600
       - NODE_ENV=production
     networks:
       - marry-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4500/api/responses"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4600/api/responses"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -33,13 +33,13 @@ services:
     container_name: marry-frontend
     restart: unless-stopped
     ports:
-      - "9999:9999"
+      - "4500:4500"
     depends_on:
       - backend
     networks:
       - marry-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9999"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4500"]
       interval: 30s
       timeout: 10s
       retries: 3

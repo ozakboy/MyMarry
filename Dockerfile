@@ -34,7 +34,7 @@ RUN mkdir -p /app/data && \
     echo '[]' > /app/data/responses.json
 
 # 暴露後端 API port
-EXPOSE 4500
+EXPOSE 4600
 
 # 啟動後端服務
 CMD ["node", "server/index.js"]
@@ -49,6 +49,6 @@ COPY --from=frontend-builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # 暴露 HTTP port
-EXPOSE 9999
+EXPOSE 4500
 
 CMD ["nginx", "-g", "daemon off;"]
