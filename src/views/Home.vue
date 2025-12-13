@@ -1,5 +1,5 @@
 <template>
-  <div class="min-vh-100 d-flex align-items-center" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+  <div class="min-vh-100 d-flex align-items-center" style="background: linear-gradient(135deg, #ffd1dc 0%, #ffb6c1 100%);">
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
@@ -7,7 +7,7 @@
             <div class="card-body p-3 p-sm-4 p-md-5">
               <!-- 標題區 -->
               <div class="text-center mb-3 mb-md-4">
-                <h1 class="display-4 fw-bold text-primary mb-2 mb-md-3">💒 婚禮邀請 💒</h1>
+                <h1 class="display-4 fw-bold mb-2 mb-md-3" style="color: #d4357f;">💒 婚禮邀請 💒</h1>
                 <p class="lead text-muted mb-3 mb-md-4" v-if="weddingInfo">{{ weddingInfo.invitation?.greeting || '親愛的朋友：' }}</p>
                 <p class="fs-5 mb-0" style="white-space: pre-line;" v-if="weddingInfo">
                   {{ weddingInfo.invitation?.message || '我們即將攜手步入人生的新階段\n誠摯邀請您蒞臨見證我們的幸福時刻' }}
@@ -19,11 +19,11 @@
               <!-- 新人資訊 -->
               <div class="row text-center mb-3 mb-md-4" v-if="weddingInfo">
                 <div class="col-6">
-                  <h3 class="text-primary mb-2">🤵 新郎</h3>
+                  <h3 class="mb-2" style="color: #d4357f;">🤵 新郎</h3>
                   <p class="fs-4 fw-bold mb-0">{{ weddingInfo.groom?.name || '新郎' }}</p>
                 </div>
                 <div class="col-6">
-                  <h3 class="text-danger mb-2">👰 新娘</h3>
+                  <h3 class="mb-2" style="color: #ff69b4;">👰 新娘</h3>
                   <p class="fs-4 fw-bold mb-0">{{ weddingInfo.bride?.name || '新娘' }}</p>
                 </div>
               </div>
@@ -36,19 +36,19 @@
                 <div class="row g-3">
                   <div class="col-12 col-sm-6">
                     <div class="d-flex align-items-center">
-                      <span class="badge bg-primary me-2">日期</span>
+                      <span class="badge me-2" style="background-color: #ff69b4;">日期</span>
                       <span class="fs-6">{{ weddingInfo.wedding?.date || '2025年02月07日' }} {{ weddingInfo.wedding?.dayOfWeek || '星期六' }}</span>
                     </div>
                   </div>
                   <div class="col-12 col-sm-6">
                     <div class="d-flex align-items-center">
-                      <span class="badge bg-primary me-2">時間</span>
+                      <span class="badge me-2" style="background-color: #ff69b4;">時間</span>
                       <span class="fs-6">{{ weddingInfo.wedding?.time || '晚上 6:00' }}</span>
                     </div>
                   </div>
                   <div class="col-12">
                     <div class="d-flex align-items-start">
-                      <span class="badge bg-primary me-2">地點</span>
+                      <span class="badge me-2" style="background-color: #ff69b4;">地點</span>
                       <div class="flex-grow-1">
                         <div class="fs-6 mb-1">{{ weddingInfo.wedding?.venue?.name || '新喜樓' }} {{ weddingInfo.wedding?.venue?.type || '餐廳' }}</div>
                         <div class="text-muted small">{{ weddingInfo.wedding?.venue?.address || '428台灣臺中市大雅區民生路四段198號' }}</div>
@@ -74,7 +74,7 @@
               <!-- RSVP 說明 -->
               <div class="text-center mb-3 mb-md-4" v-if="weddingInfo">
                 <p class="mb-3" style="white-space: pre-line;">{{ weddingInfo.invitation?.rsvpText || '請您填寫以下表單\n讓我們知道您的出席狀況' }}</p>
-                <router-link to="/form" class="btn btn-primary btn-lg px-4 px-md-5">
+                <router-link to="/form" class="btn btn-lg px-4 px-md-5" style="background-color: #ff69b4; border: none; color: white;">
                   📝 填寫出席表單
                 </router-link>
               </div>
@@ -122,11 +122,12 @@ onMounted(async () => {
   transform: translateY(-5px);
 }
 
-.btn-primary {
+.btn {
   transition: all 0.3s ease;
 }
 
-.btn-primary:hover {
+.btn:hover {
   transform: scale(1.05);
+  opacity: 0.9;
 }
 </style>

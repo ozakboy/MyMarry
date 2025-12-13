@@ -1,5 +1,5 @@
 <template>
-  <div class="min-vh-100 py-3 py-sm-4 py-md-5" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+  <div class="min-vh-100 py-3 py-sm-4 py-md-5" style="background: linear-gradient(135deg, #ffd1dc 0%, #ffb6c1 100%);">
     <div class="container-fluid">
       <div class="row justify-content-center">
         <div class="col-12 col-xl-11">
@@ -7,7 +7,7 @@
             <div class="card-body p-3 p-sm-4 p-md-5">
               <!-- 標題 -->
               <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4">
-                <h2 class="fw-bold text-primary mb-0">📊 出席回覆管理</h2>
+                <h2 class="fw-bold mb-0" style="color: #d4357f;">📊 出席回覆管理</h2>
                 <router-link to="/" class="btn btn-outline-secondary">
                   ← 返回首頁
                 </router-link>
@@ -32,7 +32,7 @@
                   </div>
                 </div>
                 <div class="col-6 col-md-3">
-                  <div class="card bg-primary text-white h-100">
+                  <div class="card text-white h-100" style="background-color: #ff69b4;">
                     <div class="card-body text-center">
                       <h6 class="card-title mb-2">🍽️ 總人數</h6>
                       <h3 class="mb-0">{{ totalAttendees }}</h3>
@@ -40,7 +40,7 @@
                   </div>
                 </div>
                 <div class="col-6 col-md-3">
-                  <div class="card bg-info text-white h-100">
+                  <div class="card text-white h-100" style="background-color: #ffb6c1;">
                     <div class="card-body text-center">
                       <h6 class="card-title mb-2">👶 兒童座椅</h6>
                       <h3 class="mb-0">{{ childSeatCount }}</h3>
@@ -110,7 +110,7 @@
                       <td>{{ response.phone }}</td>
                       <td>{{ response.relationship }}</td>
                       <td>
-                        <span :class="response.side === 'groom' ? 'badge bg-primary' : 'badge bg-danger'">
+                        <span class="badge" :style="response.side === 'groom' ? 'background-color: #d4357f;' : 'background-color: #ff69b4;'">
                           {{ response.side === 'groom' ? '🤵 男方' : '👰 女方' }}
                         </span>
                       </td>
@@ -166,7 +166,7 @@
                         <div><strong>關係：</strong>{{ response.relationship }}</div>
                         <div>
                           <strong>賓客：</strong>
-                          <span :class="response.side === 'groom' ? 'badge bg-primary' : 'badge bg-danger'">
+                          <span class="badge" :style="response.side === 'groom' ? 'background-color: #d4357f;' : 'background-color: #ff69b4;'">
                             {{ response.side === 'groom' ? '🤵 男方' : '👰 女方' }}
                           </span>
                         </div>

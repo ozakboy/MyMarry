@@ -1,5 +1,5 @@
 <template>
-  <div class="min-vh-100 py-3 py-sm-4 py-md-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+  <div class="min-vh-100 py-3 py-sm-4 py-md-5" style="background: linear-gradient(135deg, #ffb6c1 0%, #ff69b4 100%);">
     <div class="container">
       <div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
@@ -7,7 +7,7 @@
             <div class="card-body p-3 p-sm-4 p-md-5">
               <!-- 標題 -->
               <div class="text-center mb-3 mb-md-4">
-                <h2 class="fw-bold text-primary mb-2">📝 出席回覆表單</h2>
+                <h2 class="fw-bold mb-2" style="color: #d4357f;">📝 出席回覆表單</h2>
                 <p class="text-muted">請填寫以下資訊，謝謝您！</p>
               </div>
 
@@ -426,16 +426,16 @@ const submitForm = async () => {
 <style scoped>
 .form-control:focus,
 .form-select:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+  border-color: #ff69b4;
+  box-shadow: 0 0 0 0.25rem rgba(255, 105, 180, 0.25);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ff69b4 0%, #d4357f 100%);
   border: none;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #5568d3 0%, #66408b 100%);
+  background: linear-gradient(135deg, #ff85c0 0%, #e04990 100%);
 }
 </style>
