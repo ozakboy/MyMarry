@@ -30,15 +30,24 @@ RUN npm install express@5.2.1 cors@2.8.5
 # 複製後端程式碼
 COPY server ./server
 
-# 建立資料目錄
+# 建立資料目錄和初始化腳本
 RUN mkdir -p /app/data && \
-    echo '[]' > /app/data/responses.json
+    echo '[]' > /app/data/responses.json && \
+    chmod -R 777 /app/data
+
+# 建立啟動腳本
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'if [ ! -f /app/data/responses.json ]; then' >> /app/start.sh && \
+    echo '  echo "[]" > /app/data/responses.json' >> /app/start.sh && \
+    echo 'fi' >> /app/start.sh && \
+    echo 'node server/index.js' >> /app/start.sh && \
+    chmod +x /app/start.sh
 
 # 暴露後端 API port
 EXPOSE 4600
 
-# 啟動後端服務
-CMD ["node", "server/index.js"]
+# 使用啟動腳本
+CMD ["/app/start.sh"]
 
 # 多階段建置 - 階段 3: Nginx 服務前端
 FROM nginx:alpine AS production
