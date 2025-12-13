@@ -1,5 +1,5 @@
 # 多階段建置 - 階段 1: 建置前端
-FROM node:18-alpine AS frontend-builder
+FROM node:22-alpine AS frontend-builder
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ RUN if [ -f pnpm-lock.yaml ]; then \
 RUN pnpm run build
 
 # 多階段建置 - 階段 2: 後端運行環境
-FROM node:18-alpine AS backend
+FROM node:22-alpine AS backend
 
 WORKDIR /app
 
