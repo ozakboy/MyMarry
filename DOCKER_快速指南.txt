@@ -1,0 +1,118 @@
+========================================
+婚禮 RSVP 系統 - Docker 快速部署指南
+========================================
+
+【超簡單！三步驟部署到 Linux】
+
+步驟 1: 上傳專案到 Linux 主機
+--------------------------------
+# 方式 A: 使用 git
+git clone <your-repo> marry && cd marry
+
+# 方式 B: 使用 scp 上傳
+scp -r marry user@server:/path/to/marry
+
+
+步驟 2: 啟動 Docker 容器
+------------------------
+cd marry
+docker-compose up -d
+
+
+步驟 3: 完成！
+-------------
+瀏覽器訪問：http://您的主機IP:9999
+
+
+========================================
+常用指令速查
+========================================
+
+啟動服務：
+  docker-compose up -d
+
+停止服務：
+  docker-compose down
+
+重啟服務：
+  docker-compose restart
+
+查看日誌：
+  docker-compose logs -f
+
+查看狀態：
+  docker-compose ps
+
+更新部署：
+  git pull
+  docker-compose up -d --build
+
+備份資料：
+  cp -r data data.backup.$(date +%Y%m%d)
+
+
+========================================
+架構說明
+========================================
+
+marry-frontend (Nginx:9999)  # 前端網頁服務
+      ↓
+marry-backend (Node:4500)    # 後端 API 服務
+      ↓
+./data/responses.json        # 資料存儲
+
+
+========================================
+Port 設定
+========================================
+
+前端網頁：http://您的IP:9999
+後端 API：http://您的IP:4500 (通常不直接訪問)
+
+如需修改 Port，編輯 docker-compose.yml
+
+
+========================================
+修改設定
+========================================
+
+【修改 Port】
+編輯 docker-compose.yml：
+  frontend:
+    ports:
+      - "8080:9999"  # 改為 8080
+
+【修改婚禮資訊】
+編輯：public/wedding-config.json
+然後：docker-compose restart frontend
+
+【查看 RSVP 資料】
+  cat data/responses.json
+或訪問：http://您的IP:9999/MarryList
+
+
+========================================
+故障排除
+========================================
+
+服務無法啟動？
+  docker-compose logs
+
+API 連不上？
+  docker-compose logs backend
+  curl http://localhost:4500/api/responses
+
+Port 被占用？
+  sudo netstat -tlnp | grep :9999
+  # 修改 docker-compose.yml 中的 Port
+
+資料無法儲存？
+  ls -la data/
+  chmod 777 data/
+
+
+========================================
+完整文檔
+========================================
+
+詳細說明請參閱：README.md

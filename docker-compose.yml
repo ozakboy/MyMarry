@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # 後端 API 服務
+  backend:
+    build:
+      context: .
+      target: backend
+    container_name: marry-backend
+    restart: unless-stopped
+    ports:
+      - "4500:4500"
+    volumes:
+      # 將資料持久化到主機
+      - ./data:/app/data
+    environment:
+      - PORT=4500
+      - NODE_ENV=production
+    networks:
+      - marry-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4500/api/responses"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 前端 Nginx 服務
+  frontend:
+    build:
+      context: .
+      target: production
+    container_name: marry-frontend
+    restart: unless-stopped
+    ports:
+      - "9999:9999"
+    depends_on:
+      - backend
+    networks:
+      - marry-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9999"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  marry-network:
+    driver: bridge
+
+volumes:
+  marry-data:
+    driver: local

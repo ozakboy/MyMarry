@@ -1,0 +1,47 @@
+# 依賴目錄
+node_modules
+npm-debug.log
+pnpm-lock.yaml
+
+# 建置輸出
+dist
+build
+marry-deploy
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# 文檔
+*.md
+!README.md
+
+# 測試
+*.test.js
+coverage
+
+# 環境變數
+.env
+.env.local
+
+# 系統檔案
+.DS_Store
+Thumbs.db
+
+# Windows 相關
+*.bat
+*.ps1
+
+# 日誌
+logs
+*.log
+
+# 臨時檔案
+tmp
+temp

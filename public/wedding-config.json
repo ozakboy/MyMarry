@@ -1,0 +1,33 @@
+{
+  "groom": {
+    "name": "蔡承訓",
+    "fullName": "蔡承訓"
+  },
+  "bride": {
+    "name": "江菁雲",
+    "fullName": "江菁雲"
+  },
+  "wedding": {
+    "date": "2025年02月07日",
+    "dayOfWeek": "星期六",
+    "time": "晚上 6:00",
+    "venue": {
+      "name": "新喜樓",
+      "type": "餐廳",
+      "address": "428台灣臺中市大雅區民生路四段198號",
+      "floor": "宴會廳",
+      "googleMapUrl": "https://www.google.com/maps/search/?api=1&query=新喜樓餐廳",
+      "phone": "0425691889"
+    }
+  },
+  "invitation": {
+    "greeting": "親愛的朋友：",
+    "message": "我們即將攜手步入人生的新階段\n誠摯邀請您蒞臨見證我們的幸福時刻",
+    "rsvpText": "請您填寫以下表單\n讓我們知道您的出席狀況"
+  },
+  "contact": {
+    "groomPhone": "0975-276-906",
+    "bridePhone": "0979-999-912",
+    "email": "awc0450056@gmail.com"
+  }
+}
