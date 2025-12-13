@@ -6,14 +6,15 @@ WORKDIR /app
 # 安裝 pnpm
 RUN npm install -g pnpm
 
-# 複製 package 檔案
-COPY package.json pnpm-lock.yaml* ./
-
-# 安裝依賴
-RUN pnpm install --frozen-lockfile
-
-# 複製前端源碼
+# 複製所有檔案
 COPY . .
+
+# 安裝依賴（如果 pnpm-lock.yaml 存在則使用 frozen-lockfile，否則正常安裝）
+RUN if [ -f pnpm-lock.yaml ]; then \
+      pnpm install --frozen-lockfile; \
+    else \
+      pnpm install; \
+    fi
 
 # 建置前端
 RUN pnpm run build

@@ -1,4 +1,4 @@
-========================================
+﻿========================================
 婚禮 RSVP 系統 - Docker 快速部署指南
 ========================================
 
@@ -7,7 +7,7 @@
 步驟 1: 上傳專案到 Linux 主機
 --------------------------------
 # 方式 A: 使用 git
-git clone <your-repo> marry && cd marry
+git clone https://github.com/ozakboy/MyMarry.git marry && cd marry
 
 # 方式 B: 使用 scp 上傳
 scp -r marry user@server:/path/to/marry
