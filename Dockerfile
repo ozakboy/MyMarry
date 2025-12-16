@@ -1,4 +1,4 @@
-# 多階段建置 - 階段 1: 建置前端
+﻿# 多階段建置 - 階段 1: 建置前端
 FROM node:22-alpine AS frontend-builder
 
 WORKDIR /app
@@ -32,6 +32,7 @@ RUN npm install express@5.2.1 cors@2.8.5
 
 # 複製後端程式碼
 COPY server ./server
+COPY public ./public
 
 # 建立資料目錄和初始化腳本
 RUN mkdir -p /app/data && \
