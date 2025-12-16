@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="min-vh-100 d-flex align-items-center" style="background: linear-gradient(135deg, #ffd1dc 0%, #ffb6c1 100%);">
     <div class="container">
       <div class="row justify-content-center">
@@ -81,7 +81,7 @@
 
               <!-- 聯絡資訊 -->
               <div class="text-center mt-3 mt-md-4 pt-3 pt-md-4 border-top" v-if="weddingInfo?.contact">
-                <p class="text-muted small mb-2">如有任何問題，歡迎聯絡我們</p>
+                <p class="text-muted small mb-2">- 如有任何問題 ， 歡迎聯絡我們 -</p>
                 <p class="text-muted small mb-0" v-if="weddingInfo.contact.groomPhone || weddingInfo.contact.bridePhone">
                   新郎：{{ weddingInfo.contact.groomPhone || 'N/A' }} |
                   新娘：{{ weddingInfo.contact.bridePhone || 'N/A' }}
