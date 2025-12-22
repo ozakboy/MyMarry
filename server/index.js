@@ -65,6 +65,35 @@ app.post('/api/responses', (req, res) => {
   }
 })
 
+// 更新回覆資料
+app.put('/api/responses/:id', (req, res) => {
+  try {
+    const data = fs.readFileSync(dataFile, 'utf-8')
+    const responses = JSON.parse(data)
+
+    const index = responses.findIndex(r => r.id === parseInt(req.params.id))
+    if (index === -1) {
+      return res.status(404).json({ error: '找不到該資料' })
+    }
+
+    responses[index] = {
+      ...responses[index],
+      ...req.body,
+      id: responses[index].id,
+      timestamp: responses[index].timestamp
+    }
+
+    fs.writeFileSync(dataFile, JSON.stringify(responses, null, 2), 'utf-8')
+
+    console.log(`更新資料 ID: ${req.params.id}`)
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json({ message: '資料更新成功', data: responses[index] })
+  } catch (error) {
+    console.error('更新資料錯誤：', error)
+    res.status(500).json({ error: '更新資料失敗' })
+  }
+})
+
 // 刪除回覆資料
 app.delete('/api/responses/:id', (req, res) => {
   try {
