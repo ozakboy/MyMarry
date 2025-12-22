@@ -112,6 +112,24 @@ app.delete('/api/responses/:id', (req, res) => {
   }
 })
 
+// 更新婚禮設定
+app.post('/api/config', (req, res) => {
+  try {
+    const configFile = process.env.NODE_ENV === 'production'
+      ? '/app/public/wedding-config.json'
+      : path.join(__dirname, '..', 'public', 'wedding-config.json')
+
+    fs.writeFileSync(configFile, JSON.stringify(req.body, null, 2), 'utf-8')
+
+    console.log('婚禮設定已更新')
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json({ message: '設定更新成功' })
+  } catch (error) {
+    console.error('更新設定錯誤：', error)
+    res.status(500).json({ error: '設定更新失敗' })
+  }
+})
+
 app.listen(PORT, () => {
   console.log(`後端伺服器運行於 http://localhost:${PORT}`)
   console.log(`資料檔案位置：${dataFile}`)

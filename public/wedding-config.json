@@ -1,4 +1,4 @@
-﻿{
+{
   "groom": {
     "name": "蔡承訓",
     "fullName": "蔡承訓"
@@ -29,5 +29,7 @@
     "groomPhone": "0975-276-906",
     "bridePhone": "0979-999-912",
     "email": "awc0450056@gmail.com"
-  }
+  },
+  "defaultCookieCount": 1,
+  "seatsPerTable": 10
 }

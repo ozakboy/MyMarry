@@ -5,148 +5,208 @@
         <div class="col-12 col-xl-11">
           <div class="card shadow-lg border-0 rounded-4">
             <div class="card-body p-3 p-sm-4 p-md-5">
-              <!-- 標題 -->
-              <div class="d-flex justify-content-between align-items-center mb-3 mb-md-4">
-                <h2 class="fw-bold mb-0" style="color: #d4357f;">📊 出席回覆管理</h2>
-                <router-link to="/" class="btn btn-outline-secondary">
-                  ← 返回首頁
-                </router-link>
-              </div>
+              <!-- 標題和篩選器 -->
+              <div class="mb-3 mb-md-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h2 class="fw-bold mb-0" style="color: #d4357f;">📊 出席回覆管理</h2>
+                  <div class="d-flex gap-2">
+                    <router-link to="/settings" class="btn btn-outline-primary">
+                      ⚙️ 設定
+                    </router-link>
+                    <router-link to="/" class="btn btn-outline-secondary">
+                      ← 返回首頁
+                    </router-link>
+                  </div>
+                </div>
 
-              <!-- 統計卡片 -->
-              <div class="row g-3 mb-3 mb-md-4">
-                <div class="col-6 col-md-3">
-                  <div class="card bg-success text-white h-100">
-                    <div class="card-body text-center">
-                      <h6 class="card-title mb-2">✅ 出席</h6>
-                      <h3 class="mb-0">{{ attendanceStats.willAttend }}</h3>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-6 col-md-3">
-                  <div class="card bg-danger text-white h-100">
-                    <div class="card-body text-center">
-                      <h6 class="card-title mb-2">❌ 不出席</h6>
-                      <h3 class="mb-0">{{ attendanceStats.wontAttend }}</h3>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-6 col-md-3">
-                  <div class="card text-white h-100" style="background-color: #ff69b4;">
-                    <div class="card-body text-center">
-                      <h6 class="card-title mb-2">🍽️ 總人數</h6>
-                      <h3 class="mb-0">{{ totalAttendees }}</h3>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-6 col-md-3">
-                  <div class="card text-white h-100" style="background-color: #ffb6c1;">
-                    <div class="card-body text-center">
-                      <h6 class="card-title mb-2">👶 兒童座椅</h6>
-                      <h3 class="mb-0">{{ childSeatCount }}</h3>
-                    </div>
-                  </div>
+                <!-- 快速篩選 -->
+                <div class="btn-group w-100" role="group">
+                  <button type="button" class="btn" :class="filter === 'all' ? 'btn-primary' : 'btn-outline-primary'" @click="filter = 'all'">
+                    全部 ({{ responses.length }})
+                  </button>
+                  <button type="button" class="btn" :class="filter === 'groom' ? 'btn-primary' : 'btn-outline-primary'" @click="filter = 'groom'">
+                    🤵 男方 ({{ sideStats.groom.count }})
+                  </button>
+                  <button type="button" class="btn" :class="filter === 'bride' ? 'btn-primary' : 'btn-outline-primary'" @click="filter = 'bride'">
+                    👰 女方 ({{ sideStats.bride.count }})
+                  </button>
                 </div>
               </div>
 
-              <!-- 次要統計 -->
-              <div class="row g-3 mb-3 mb-md-4">
-                <div class="col-6 col-md-3">
-                  <div class="card bg-light h-100">
-                    <div class="card-body text-center">
-                      <h6 class="card-title mb-2">🥩 葷食</h6>
-                      <h5 class="mb-0">{{ mealStats.meat }}</h5>
+              <!-- 統計總覽 - 重新設計 -->
+              <div class="row g-3 mb-4">
+                <!-- 第一行:基本統計 -->
+                <div class="col-12">
+                  <div class="card border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="card-body text-white">
+                      <h5 class="card-title mb-3">📈 總體統計</h5>
+                      <div class="row g-3 text-center">
+                        <div class="col-6 col-md-3">
+                          <div class="stat-item">
+                            <div class="stat-label">總回覆</div>
+                            <div class="stat-value">{{ responses.length }}</div>
+                          </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                          <div class="stat-item">
+                            <div class="stat-label">出席人數</div>
+                            <div class="stat-value">{{ totalAttendees }}</div>
+                          </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                          <div class="stat-item">
+                            <div class="stat-label">預計桌數</div>
+                            <div class="stat-value">{{ estimatedTables }}</div>
+                          </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                          <div class="stat-item">
+                            <div class="stat-label">禮金總額</div>
+                            <div class="stat-value">{{ totalGiftMoney.toLocaleString() }}</div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div class="col-6 col-md-3">
-                  <div class="card bg-light h-100">
-                    <div class="card-body text-center">
-                      <h6 class="card-title mb-2">🥗 素食</h6>
-                      <h5 class="mb-0">{{ mealStats.vegetarian }}</h5>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-6 col-md-3">
-                  <div class="card bg-light h-100">
-                    <div class="card-body text-center">
-                      <h6 class="card-title mb-2">📮 需要喜帖</h6>
-                      <h5 class="mb-0">{{ invitationCount }}</h5>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-6 col-md-3">
-                  <div class="card bg-light h-100">
-                    <div class="card-body text-center">
-                      <h6 class="card-title mb-2">📝 總回覆</h6>
-                      <h5 class="mb-0">{{ responses.length }}</h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-              <!-- 男女方統計 -->
-              <div class="row g-3 mb-3 mb-md-4">
-                <div class="col-12 col-md-6">
+                <!-- 第二行:出席/餐點/需求 -->
+                <div class="col-md-4">
                   <div class="card h-100">
+                    <div class="card-header bg-light">
+                      <h6 class="mb-0">👥 出席狀況</h6>
+                    </div>
+                    <div class="card-body">
+                      <div class="d-flex justify-content-around">
+                        <div class="text-center">
+                          <div class="text-success fs-4 fw-bold">{{ attendanceStats.willAttend }}</div>
+                          <small class="text-muted">出席</small>
+                        </div>
+                        <div class="text-center">
+                          <div class="text-danger fs-4 fw-bold">{{ attendanceStats.wontAttend }}</div>
+                          <small class="text-muted">不出席</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="card h-100">
+                    <div class="card-header bg-light">
+                      <h6 class="mb-0">🍽️ 餐點統計</h6>
+                    </div>
+                    <div class="card-body">
+                      <div class="d-flex justify-content-around">
+                        <div class="text-center">
+                          <div class="fs-4 fw-bold">{{ mealStats.meat }}</div>
+                          <small class="text-muted">葷食</small>
+                        </div>
+                        <div class="text-center">
+                          <div class="fs-4 fw-bold">{{ mealStats.vegetarian }}</div>
+                          <small class="text-muted">素食</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="card h-100">
+                    <div class="card-header bg-light">
+                      <h6 class="mb-0">📦 需求統計</h6>
+                    </div>
+                    <div class="card-body">
+                      <div class="d-flex justify-content-around">
+                        <div class="text-center">
+                          <div class="fs-4 fw-bold">{{ childSeatCount }}</div>
+                          <small class="text-muted">座椅</small>
+                        </div>
+                        <div class="text-center">
+                          <div class="fs-4 fw-bold">{{ invitationCount }}</div>
+                          <small class="text-muted">喜帖</small>
+                        </div>
+                        <div class="text-center">
+                          <div class="fs-4 fw-bold">{{ totalCookies }}</div>
+                          <small class="text-muted">喜餅</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 第三行:男女方統計 -->
+                <div class="col-md-6">
+                  <div class="card">
                     <div class="card-header text-white" style="background-color: #d4357f;">
-                      <h6 class="mb-0">🤵 男方賓客統計</h6>
+                      <h6 class="mb-0">🤵 男方賓客</h6>
                     </div>
                     <div class="card-body">
-                      <div class="row text-center">
-                        <div class="col-4">
-                          <small class="text-muted">回覆數</small>
-                          <h5>{{ sideStats.groom.count }}</h5>
+                      <div class="row text-center g-3">
+                        <div class="col-3">
+                          <div class="text-muted small">回覆</div>
+                          <div class="fw-bold">{{ sideStats.groom.count }}</div>
                         </div>
-                        <div class="col-4">
-                          <small class="text-muted">出席數</small>
-                          <h5>{{ sideStats.groom.attending }}</h5>
+                        <div class="col-3">
+                          <div class="text-muted small">出席</div>
+                          <div class="fw-bold">{{ sideStats.groom.attending }}</div>
                         </div>
-                        <div class="col-4">
-                          <small class="text-muted">總人數</small>
-                          <h5>{{ sideStats.groom.totalAttendees }}</h5>
+                        <div class="col-3">
+                          <div class="text-muted small">人數</div>
+                          <div class="fw-bold">{{ sideStats.groom.totalAttendees }}</div>
+                        </div>
+                        <div class="col-3">
+                          <div class="text-muted small">禮金</div>
+                          <div class="fw-bold text-success">{{ giftMoneyByGender.groom.toLocaleString() }}</div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div class="col-12 col-md-6">
-                  <div class="card h-100">
-                    <div class="card-header text-white" style="background-color: #ff69b4;">
-                      <h6 class="mb-0">👰 女方賓客統計</h6>
-                    </div>
-                    <div class="card-body">
-                      <div class="row text-center">
-                        <div class="col-4">
-                          <small class="text-muted">回覆數</small>
-                          <h5>{{ sideStats.bride.count }}</h5>
-                        </div>
-                        <div class="col-4">
-                          <small class="text-muted">出席數</small>
-                          <h5>{{ sideStats.bride.attending }}</h5>
-                        </div>
-                        <div class="col-4">
-                          <small class="text-muted">總人數</small>
-                          <h5>{{ sideStats.bride.totalAttendees }}</h5>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-              <!-- 關係類型統計 -->
-              <div class="card mb-3 mb-md-4">
-                <div class="card-header text-white" style="background-color: #ffb6c1;">
-                  <h6 class="mb-0">👥 關係類型統計</h6>
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header text-white" style="background-color: #ff69b4;">
+                      <h6 class="mb-0">👰 女方賓客</h6>
+                    </div>
+                    <div class="card-body">
+                      <div class="row text-center g-3">
+                        <div class="col-3">
+                          <div class="text-muted small">回覆</div>
+                          <div class="fw-bold">{{ sideStats.bride.count }}</div>
+                        </div>
+                        <div class="col-3">
+                          <div class="text-muted small">出席</div>
+                          <div class="fw-bold">{{ sideStats.bride.attending }}</div>
+                        </div>
+                        <div class="col-3">
+                          <div class="text-muted small">人數</div>
+                          <div class="fw-bold">{{ sideStats.bride.totalAttendees }}</div>
+                        </div>
+                        <div class="col-3">
+                          <div class="text-muted small">禮金</div>
+                          <div class="fw-bold text-success">{{ giftMoneyByGender.bride.toLocaleString() }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="card-body">
-                  <div class="row g-3">
-                    <div class="col-6 col-md-2" v-for="(stat, rel) in relationshipStats" :key="rel">
-                      <div class="text-center">
-                        <small class="text-muted d-block">{{ rel }}</small>
-                        <h5 class="mb-0">{{ stat.count }}</h5>
-                        <small class="text-muted">{{ stat.attendees }}人</small>
+
+                <!-- 關係類型統計 -->
+                <div class="col-12">
+                  <div class="card">
+                    <div class="card-header text-white" style="background-color: #ffb6c1;">
+                      <h6 class="mb-0">👥 關係類型統計</h6>
+                    </div>
+                    <div class="card-body">
+                      <div class="row g-3">
+                        <div class="col-6 col-md-2" v-for="(stat, rel) in relationshipStats" :key="rel">
+                          <div class="text-center">
+                            <small class="text-muted d-block">{{ rel }}</small>
+                            <div class="fw-bold">{{ stat.count }}組</div>
+                            <small class="text-muted">{{ stat.attendees }}人</small>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -166,14 +226,14 @@
                       <th>人數</th>
                       <th>餐點</th>
                       <th>座椅</th>
+                      <th style="min-width: 100px;">禮金</th>
+                      <th style="min-width: 80px;">喜餅</th>
                       <th style="min-width: 200px;">喜帖資訊</th>
-                      <th style="min-width: 150px;">祝福</th>
-                      <th style="min-width: 150px;">備註</th>
                       <th style="min-width: 120px;">操作</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="response in responses" :key="response.id">
+                    <tr v-for="response in filteredResponses" :key="response.id">
                       <td class="fw-bold">{{ response.name }}</td>
                       <td>{{ response.phone }}</td>
                       <td>{{ response.relationship }}</td>
@@ -193,6 +253,15 @@
                         {{ response.needChildSeat === 'yes' ? `✅ ${response.childSeatCount}張` : '❌' }}
                       </td>
                       <td>
+                        <span v-if="response.giftMoney" class="text-success fw-bold">
+                          ${{ response.giftMoney.toLocaleString() }}
+                        </span>
+                        <span v-else class="text-muted">-</span>
+                      </td>
+                      <td>
+                        <span class="badge bg-info">{{ response.cookieCount || defaultCookieCount }}</span>
+                      </td>
+                      <td>
                         <div v-if="response.needInvitation === 'yes'">
                           <span class="badge bg-success mb-1">✅ 需要</span>
                           <div class="small">
@@ -202,14 +271,6 @@
                           </div>
                         </div>
                         <span v-else class="badge bg-secondary">❌ 不需要</span>
-                      </td>
-                      <td>
-                        <small v-if="response.blessing">{{ response.blessing.substring(0, 30) }}{{ response.blessing.length > 30 ? '...' : '' }}</small>
-                        <span v-else class="text-muted">-</span>
-                      </td>
-                      <td>
-                        <small v-if="response.note">{{ response.note.substring(0, 30) }}{{ response.note.length > 30 ? '...' : '' }}</small>
-                        <span v-else class="text-muted">-</span>
                       </td>
                       <td>
                         <div class="btn-group-vertical w-100" role="group">
@@ -228,7 +289,7 @@
 
               <!-- 卡片列表（手機版） -->
               <div class="d-lg-none">
-                <div v-for="response in responses" :key="response.id" class="card mb-3">
+                <div v-for="response in filteredResponses" :key="response.id" class="card mb-3">
                   <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                       <h5 class="card-title mb-0">{{ response.name }}</h5>
@@ -255,15 +316,9 @@
                         <div><strong>人數：</strong>{{ response.attendees }}人</div>
                         <div><strong>餐點：</strong>{{ response.mealType }}</div>
                         <div><strong>兒童座椅：</strong>{{ response.needChildSeat === 'yes' ? `需要 ${response.childSeatCount}張` : '不需要' }}</div>
+                        <div v-if="response.giftMoney"><strong>禮金：</strong><span class="text-success fw-bold">${{ response.giftMoney.toLocaleString() }}</span></div>
+                        <div><strong>喜餅：</strong>{{ response.cookieCount || defaultCookieCount }}個</div>
                       </small>
-                    </div>
-
-                    <div v-if="response.blessing" class="mb-2">
-                      <small><strong>祝福：</strong>{{ response.blessing }}</small>
-                    </div>
-
-                    <div v-if="response.note" class="mb-2">
-                      <small><strong>備註：</strong>{{ response.note }}</small>
                     </div>
 
                     <div v-if="response.needInvitation === 'yes'" class="mb-2 p-2 bg-light rounded">
@@ -346,6 +401,14 @@
                   </select>
                 </div>
                 <div class="col-md-6" v-if="editingResponse.willAttend === 'yes'">
+                  <label class="form-label fw-bold">禮金金額</label>
+                  <input type="number" class="form-control" v-model.number="editingResponse.giftMoney" min="0" placeholder="選填">
+                </div>
+                <div class="col-md-6" v-if="editingResponse.willAttend === 'yes'">
+                  <label class="form-label fw-bold">喜餅數量</label>
+                  <input type="number" class="form-control" v-model.number="editingResponse.cookieCount" min="0" :placeholder="`預設 ${defaultCookieCount}`">
+                </div>
+                <div class="col-md-6" v-if="editingResponse.willAttend === 'yes'">
                   <label class="form-label fw-bold">需要兒童座椅</label>
                   <select class="form-select" v-model="editingResponse.needChildSeat">
                     <option value="no">不需要</option>
@@ -408,6 +471,14 @@ import { ref, computed, onMounted } from 'vue'
 
 const responses = ref([])
 const editingResponse = ref(null)
+const filter = ref('all')
+const defaultCookieCount = ref(1) // 預設每家庭1個喜餅
+
+// 篩選後的資料
+const filteredResponses = computed(() => {
+  if (filter.value === 'all') return responses.value
+  return responses.value.filter(r => r.side === filter.value)
+})
 
 // 出席統計
 const attendanceStats = computed(() => {
@@ -426,6 +497,43 @@ const attendanceStats = computed(() => {
 const totalAttendees = computed(() => {
   return responses.value.reduce((sum, r) => {
     return sum + (r.willAttend === 'yes' ? r.attendees : 0)
+  }, 0)
+})
+
+// 預計桌數 (每桌10人)
+const estimatedTables = computed(() => {
+  return Math.ceil(totalAttendees.value / 10)
+})
+
+// 禮金總額
+const totalGiftMoney = computed(() => {
+  return responses.value.reduce((sum, r) => {
+    return sum + (r.willAttend === 'yes' && r.giftMoney ? r.giftMoney : 0)
+  }, 0)
+})
+
+// 男女方禮金統計
+const giftMoneyByGender = computed(() => {
+  const stats = { groom: 0, bride: 0 }
+  responses.value.forEach(r => {
+    if (r.willAttend === 'yes' && r.giftMoney) {
+      if (r.side === 'groom') {
+        stats.groom += r.giftMoney
+      } else {
+        stats.bride += r.giftMoney
+      }
+    }
+  })
+  return stats
+})
+
+// 喜餅總數
+const totalCookies = computed(() => {
+  return responses.value.reduce((sum, r) => {
+    if (r.willAttend === 'yes') {
+      return sum + (r.cookieCount || defaultCookieCount.value)
+    }
+    return sum
   }, 0)
 })
 
@@ -577,5 +685,26 @@ onMounted(() => {
 
 .card:hover {
   transform: translateY(-2px);
+}
+
+.stat-item {
+  padding: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  opacity: 0.9;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .stat-value {
+    font-size: 1.5rem;
+  }
 }
 </style>
