@@ -9,7 +9,7 @@
   },
   "wedding": {
     "date": "2025年02月07日",
-    "dayOfWeek": "星期六",
+    "dayOfWeek": "-星期六-",
     "time": "晚上 6:00",
     "venue": {
       "name": "新喜樓",
