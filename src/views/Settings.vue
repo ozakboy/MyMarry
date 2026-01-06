@@ -1,15 +1,44 @@
 <template>
-  <div class="min-vh-100 py-3 py-sm-4 py-md-5" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
-    <div class="container">
+  <div class="min-vh-100" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+    <!-- 導航列 -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+      <div class="container-fluid">
+        <router-link to="/MarryList" class="navbar-brand fw-bold" style="color: #5f9ea0;">
+          💒 婚禮管理系統
+        </router-link>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <router-link to="/MarryList" class="nav-link">
+                📊 出席管理
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link to="/settings" class="nav-link active">
+                ⚙️ 系統設定
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link to="/" class="nav-link">
+                🏠 返回首頁
+              </router-link>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 主要內容 -->
+    <div class="container py-3 py-sm-4 py-md-5">
       <div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-8">
           <div class="card shadow-lg border-0 rounded-4">
             <div class="card-body p-3 p-sm-4 p-md-5">
-              <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="mb-4">
                 <h2 class="fw-bold mb-0" style="color: #5f9ea0;">⚙️ 系統設定</h2>
-                <router-link to="/MarryList" class="btn btn-outline-secondary">
-                  ← 返回管理頁
-                </router-link>
               </div>
 
               <!-- 新人資訊 -->
@@ -244,7 +273,7 @@ const weddingConfig = ref({
 // 載入設定
 const loadConfig = async () => {
   try {
-    const response = await fetch('/wedding-config.json')
+    const response = await fetch('/api/config')
     const config = await response.json()
     weddingConfig.value = config
   } catch (error) {
@@ -285,6 +314,31 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 導航列樣式 */
+.navbar {
+  margin-bottom: 0;
+}
+
+.navbar-brand {
+  font-size: 1.25rem;
+}
+
+.nav-link {
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #5f9ea0 !important;
+  transform: translateY(-2px);
+}
+
+.nav-link.active {
+  color: #5f9ea0 !important;
+  font-weight: 600;
+}
+
+/* 卡片樣式 */
 .card {
   transition: transform 0.2s;
 }
@@ -302,5 +356,11 @@ onMounted(() => {
 
 .btn-primary:hover {
   background: linear-gradient(135deg, #4a7a7c 0%, #3d6365 100%);
+}
+
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1rem;
+  }
 }
 </style>

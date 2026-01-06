@@ -19,6 +19,11 @@ const dataFile = process.env.NODE_ENV === 'production'
   ? '/app/data/responses.json'
   : path.join(__dirname, 'data', 'responses.json')
 
+// wedding-config.json 路徑
+const configFile = process.env.NODE_ENV === 'production'
+  ? '/app/data/wedding-config.json'
+  : path.join(__dirname, '..', 'public', 'wedding-config.json')
+
 // 初始化資料檔案
 const dataDir = path.dirname(dataFile)
 if (!fs.existsSync(dataDir)) {
@@ -26,6 +31,15 @@ if (!fs.existsSync(dataDir)) {
 }
 if (!fs.existsSync(dataFile)) {
   fs.writeFileSync(dataFile, JSON.stringify([]), 'utf-8')
+}
+
+// 初始化 wedding-config.json (僅在生產環境且檔案不存在時複製)
+if (process.env.NODE_ENV === 'production' && !fs.existsSync(configFile)) {
+  const defaultConfigPath = '/app/public/wedding-config.json'
+  if (fs.existsSync(defaultConfigPath)) {
+    fs.copyFileSync(defaultConfigPath, configFile)
+    console.log('wedding-config.json 已從預設範本複製到 data 目錄')
+  }
 }
 
 // 讀取所有回覆資料
@@ -112,13 +126,21 @@ app.delete('/api/responses/:id', (req, res) => {
   }
 })
 
+// 讀取婚禮設定
+app.get('/api/config', (req, res) => {
+  try {
+    const data = fs.readFileSync(configFile, 'utf-8')
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json(JSON.parse(data))
+  } catch (error) {
+    console.error('讀取設定錯誤：', error)
+    res.status(500).json({ error: '讀取設定失敗' })
+  }
+})
+
 // 更新婚禮設定
 app.post('/api/config', (req, res) => {
   try {
-    const configFile = process.env.NODE_ENV === 'production'
-      ? '/app/public/wedding-config.json'
-      : path.join(__dirname, '..', 'public', 'wedding-config.json')
-
     fs.writeFileSync(configFile, JSON.stringify(req.body, null, 2), 'utf-8')
 
     console.log('婚禮設定已更新')
@@ -133,4 +155,5 @@ app.post('/api/config', (req, res) => {
 app.listen(PORT, () => {
   console.log(`後端伺服器運行於 http://localhost:${PORT}`)
   console.log(`資料檔案位置：${dataFile}`)
+  console.log(`設定檔案位置：${configFile}`)
 })

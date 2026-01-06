@@ -43,8 +43,16 @@ RUN mkdir -p /app/data && \
 
 # 建立啟動腳本
 RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo '# 初始化 responses.json' >> /app/start.sh && \
     echo 'if [ ! -f /app/data/responses.json ]; then' >> /app/start.sh && \
     echo '  echo "[]" > /app/data/responses.json' >> /app/start.sh && \
+    echo 'fi' >> /app/start.sh && \
+    echo '# 初始化 wedding-config.json (僅在不存在時從預設範本複製)' >> /app/start.sh && \
+    echo 'if [ ! -f /app/data/wedding-config.json ]; then' >> /app/start.sh && \
+    echo '  if [ -f /app/public/wedding-config.json ]; then' >> /app/start.sh && \
+    echo '    cp /app/public/wedding-config.json /app/data/wedding-config.json' >> /app/start.sh && \
+    echo '    echo "wedding-config.json 已從預設範本複製到 data 目錄"' >> /app/start.sh && \
+    echo '  fi' >> /app/start.sh && \
     echo 'fi' >> /app/start.sh && \
     echo 'node server/index.js' >> /app/start.sh && \
     chmod +x /app/start.sh
