@@ -1,4 +1,4 @@
-import express from 'express'
+﻿import express from 'express'
 import cors from 'cors'
 import fs from 'fs'
 import path from 'path'
@@ -17,13 +17,16 @@ app.use(express.json({ charset: 'utf-8' }))
 // JSON 資料檔案路徑
 const dataFile = process.env.NODE_ENV === 'production'
   ? '/app/data/responses.json'
-  : path.join(__dirname, 'data', 'responses.json')
+    : path.join(__dirname, 'data', 'responses.json')
+
+console.log('Data file path:', dataFile)
 
 // wedding-config.json 路徑
 const configFile = process.env.NODE_ENV === 'production'
   ? '/app/data/wedding-config.json'
-  : path.join(__dirname, '..', 'public', 'wedding-config.json')
+    : path.join(__dirname, 'data', 'wedding-config.json')
 
+console.log('config file path:', configFile)
 // 初始化資料檔案
 const dataDir = path.dirname(dataFile)
 if (!fs.existsSync(dataDir)) {
