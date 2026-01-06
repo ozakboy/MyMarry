@@ -17,16 +17,17 @@ app.use(express.json({ charset: 'utf-8' }))
 // JSON 資料檔案路徑
 const dataFile = process.env.NODE_ENV === 'production'
   ? '/app/data/responses.json'
-    : path.join(__dirname, 'data', 'responses.json')
+  : path.join(__dirname, '..', 'data', 'responses.json')
 
 console.log('Data file path:', dataFile)
 
 // wedding-config.json 路徑
 const configFile = process.env.NODE_ENV === 'production'
   ? '/app/data/wedding-config.json'
-    : path.join(__dirname, 'data', 'wedding-config.json')
+  : path.join(__dirname, '..', 'data', 'wedding-config.json')
 
 console.log('config file path:', configFile)
+
 // 初始化資料檔案
 const dataDir = path.dirname(dataFile)
 if (!fs.existsSync(dataDir)) {
@@ -36,12 +37,22 @@ if (!fs.existsSync(dataFile)) {
   fs.writeFileSync(dataFile, JSON.stringify([]), 'utf-8')
 }
 
-// 初始化 wedding-config.json (僅在生產環境且檔案不存在時複製)
-if (process.env.NODE_ENV === 'production' && !fs.existsSync(configFile)) {
-  const defaultConfigPath = '/app/public/wedding-config.json'
+// 初始化 wedding-config.json (如果不存在則從 public 複製)
+const configDir = path.dirname(configFile)
+if (!fs.existsSync(configDir)) {
+  fs.mkdirSync(configDir, { recursive: true })
+}
+
+if (!fs.existsSync(configFile)) {
+  const defaultConfigPath = process.env.NODE_ENV === 'production'
+    ? '/app/public/wedding-config.json'
+    : path.join(__dirname, '..', 'public', 'wedding-config.json')
+
   if (fs.existsSync(defaultConfigPath)) {
     fs.copyFileSync(defaultConfigPath, configFile)
     console.log('wedding-config.json 已從預設範本複製到 data 目錄')
+  } else {
+    console.error('找不到預設的 wedding-config.json 範本:', defaultConfigPath)
   }
 }
 
