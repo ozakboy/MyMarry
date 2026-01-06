@@ -430,7 +430,7 @@
                 </div>
                 <div class="col-md-6" v-if="editingResponse.willAttend === 'yes'">
                   <label class="form-label fw-bold">喜餅數量</label>
-                  <input type="number" class="form-control" v-model.number="editingResponse.cookieCount" min="0" :placeholder="`預設 ${defaultCookieCount}`">
+                  <input type="number" class="form-control" v-model.number="editingResponse.cookieCount" min="0" step="1" :placeholder="`預設 ${defaultCookieCount}`">
                 </div>
                 <div class="col-md-6" v-if="editingResponse.willAttend === 'yes'">
                   <label class="form-label fw-bold">需要兒童座椅</label>
