@@ -1,13 +1,13 @@
 ﻿{
   //新郎資訊
   "groom": {
-    "name": "新郎",
-    "fullName": "新郎"
+    "name": "蔡承訓",
+    "fullName": "蔡承訓"
   },
   //新娘資訊
   "bride": {
-    "name": "新娘",
-    "fullName": "新娘"
+    "name": "江宛嬑",
+    "fullName": "江宛嬑"
   },
   //婚禮資訊
   "wedding": {
@@ -15,12 +15,12 @@
     "dayOfWeek": "-星期六-",
     "time": "晚上 6:00",
     "venue": {
-      "name": "餐廳名",
+      "name": "新喜樓",
       "type": "餐廳",
-      "address": "餐廳地址",
+      "address": "428台灣臺中市大雅區民生路四段198號",
       "floor": "宴會廳",
-      "googleMapUrl": "Google連結",
-      "phone": "餐廳電話"
+      "googleMapUrl": "https://www.google.com/maps/search/?api=1&query=新喜樓餐廳",
+      "phone": "0425691889"
     }
   },
   //邀請詞
@@ -31,9 +31,9 @@
   },
   //聯絡資訊
   "contact": {
-    "groomPhone": "新郎電話",
-    "bridePhone": "新娘電話",
-    "email": "妳的信箱"
+    "groomPhone": "0975-276-906",
+    "bridePhone": "0979-999-912",
+    "email": "awc0450056@gmail.com"
   },
   //你的喜餅預設數量
   "defaultCookieCount": 1,
