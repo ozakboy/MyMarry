@@ -1,15 +1,12 @@
 ﻿{
-  //新郎資訊
   "groom": {
     "name": "蔡承訓",
     "fullName": "蔡承訓"
   },
-  //新娘資訊
   "bride": {
     "name": "江宛嬑",
     "fullName": "江宛嬑"
   },
-  //婚禮資訊
   "wedding": {
     "date": "2025年02月07日",
     "dayOfWeek": "-星期六-",
@@ -23,20 +20,16 @@
       "phone": "0425691889"
     }
   },
-  //邀請詞
   "invitation": {
     "greeting": "親愛的朋友：",
     "message": "我們即將攜手步入人生的新階段\n誠摯邀請您蒞臨見證我們的幸福時刻",
     "rsvpText": "請您填寫以下表單\n讓我們知道您的出席狀況"
   },
-  //聯絡資訊
   "contact": {
     "groomPhone": "0975-276-906",
     "bridePhone": "0979-999-912",
     "email": "awc0450056@gmail.com"
   },
-  //你的喜餅預設數量
   "defaultCookieCount": 1,
-  //每桌座位數
   "seatsPerTable": 10
 }
