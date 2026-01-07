@@ -45,7 +45,7 @@ export default {
 
     async function loadExpenses() {
       try {
-        const response = await fetch('api/expenses')
+        const response = await fetch('/api/expenses')
         if (response.ok) {
           expenses.value = await response.json()
         }
@@ -86,8 +86,8 @@ export default {
 
       try {
         const url = isEditing.value
-          ? `http://localhost:4600/api/expenses/${editingExpense.value.id}`
-          : 'http://localhost:4600/api/expenses'
+          ? `/api/expenses/${editingExpense.value.id}`
+          : '/api/expenses'
 
         const response = await fetch(url, {
           method: isEditing.value ? 'PUT' : 'POST',
