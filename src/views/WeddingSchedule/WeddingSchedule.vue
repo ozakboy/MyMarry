@@ -1,40 +1,6 @@
 <template>
   <div class="schedule-page">
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-      <div class="container-fluid">
-        <router-link to="/MarryList" class="navbar-brand fw-bold" style="color: #d4357f;">
-          💒 婚禮管理系統
-        </router-link>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <router-link to="/MarryList" class="nav-link">出席名單</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link to="/QuickView" class="nav-link">快速查詢</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link to="/Expenses" class="nav-link">花費統計</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link to="/WeddingSchedule" class="nav-link active">婚禮流程</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link to="/StaffAssignment" class="nav-link">人員配置</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link to="/SeatingChart" class="nav-link">座位表</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link to="/Settings" class="nav-link">系統設定</router-link>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+    <NavBar />
 
     <div class="container mt-4">
       <h2 class="mb-4">訂結婚流程</h2>

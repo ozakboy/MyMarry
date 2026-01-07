@@ -1,8 +1,10 @@
 ﻿import { ref, computed, onMounted } from 'vue'
 import { Modal } from 'bootstrap'
+import NavBar from '@/components/NavBar/NavBar.vue'
 
 export default {
   name: 'SeatingChart',
+  components: { NavBar },
   setup() {
     const tables = ref([])
     const responses = ref([])

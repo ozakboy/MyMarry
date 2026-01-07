@@ -1,7 +1,9 @@
 import { ref, onMounted } from 'vue'
+import NavBar from '@/components/NavBar/NavBar.vue'
 
 export default {
   name: 'Settings',
+  components: { NavBar },
   setup() {
     const isSaving = ref(false)
     const weddingConfig = ref({

@@ -1,11 +1,13 @@
 ﻿import { ref, computed, onMounted, watch } from 'vue'
 import { Modal } from 'bootstrap'
 import { Chart, registerables } from 'chart.js'
+import NavBar from '@/components/NavBar/NavBar.vue'
 
 Chart.register(...registerables)
 
 export default {
   name: 'Expenses',
+  components: { NavBar },
   setup() {
     const expenses = ref([])
     const editingExpense = ref({})

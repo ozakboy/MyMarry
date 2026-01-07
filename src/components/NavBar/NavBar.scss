@@ -1,0 +1,25 @@
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  color: #d4357f;
+  font-weight: 700;
+
+  &:hover {
+    color: #b92d6a;
+  }
+}
+
+.nav-link {
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: #d4357f;
+  }
+
+  &.active {
+    font-weight: 600;
+    color: #d4357f;
+  }
+}

@@ -1,7 +1,9 @@
 import { ref, computed, onMounted } from 'vue'
+import NavBar from '@/components/NavBar/NavBar.vue'
 
 export default {
   name: 'Admin',
+  components: { NavBar },
   setup() {
     const responses = ref([])
     const editingResponse = ref(null)
