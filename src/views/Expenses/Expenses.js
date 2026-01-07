@@ -112,7 +112,7 @@ export default {
       if (!confirm('確定要刪除此筆花費嗎？')) return
 
       try {
-        const response = await fetch(`http://localhost:4600/api/expenses/${id}`, {
+        const response = await fetch(`/api/expenses/${id}`, {
           method: 'DELETE'
         })
 
