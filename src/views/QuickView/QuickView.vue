@@ -34,13 +34,43 @@
 
       <div class="card">
         <div class="card-body">
-          <div class="mb-3">
-            <input
-              type="text"
-              class="form-control"
-              placeholder="搜尋姓名..."
-              v-model="searchQuery"
-            >
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="搜尋姓名..."
+                v-model="searchQuery"
+              >
+            </div>
+            <div class="col-md-6">
+              <div class="btn-group w-100" role="group">
+                <button
+                  type="button"
+                  class="btn"
+                  :class="sideFilter === 'all' ? 'btn-primary' : 'btn-outline-primary'"
+                  @click="sideFilter = 'all'"
+                >
+                  全部 ({{ responses.length }})
+                </button>
+                <button
+                  type="button"
+                  class="btn"
+                  :class="sideFilter === 'groom' ? 'btn-primary' : 'btn-outline-primary'"
+                  @click="sideFilter = 'groom'"
+                >
+                  新郎方 ({{ groomCount }})
+                </button>
+                <button
+                  type="button"
+                  class="btn"
+                  :class="sideFilter === 'bride' ? 'btn-danger' : 'btn-outline-danger'"
+                  @click="sideFilter = 'bride'"
+                >
+                  新娘方 ({{ brideCount }})
+                </button>
+              </div>
+            </div>
           </div>
 
           <div class="table-responsive">
@@ -64,14 +94,14 @@
                   <td>
                     <span
                       class="badge"
-                      :class="response.guestSide === '新郎' ? 'bg-primary' : 'bg-danger'"
+                      :class="response.side === 'groom' ? 'bg-primary' : 'bg-danger'"
                     >
-                      {{ response.guestSide }}
+                      {{ response.side === 'groom' ? '新郎' : '新娘' }}
                     </span>
                   </td>
-                  <td>{{ response.attendeeCount }}</td>
+                  <td>{{ response.attendees }}</td>
                   <td>{{ response.mealType }}</td>
-                  <td>{{ response.childSeats }}</td>
+                  <td>{{ response.childSeatCount }}</td>
                   <td class="fw-bold">${{ (response.giftMoney || 0).toLocaleString() }}</td>
                   <td>
                     <button

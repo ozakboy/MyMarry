@@ -8,16 +8,26 @@ export default {
   setup() {
     const responses = ref([])
     const searchQuery = ref('')
+    const sideFilter = ref('all')
     const editingResponse = ref({})
     let editGiftModalInstance = null
 
     const filteredResponses = computed(() => {
-      if (!searchQuery.value) {
-        return responses.value
+      let filtered = responses.value
+
+      // 依賓客方篩選
+      if (sideFilter.value !== 'all') {
+        filtered = filtered.filter(r => r.side === sideFilter.value)
       }
-      return responses.value.filter(r =>
-        r.name?.toLowerCase().includes(searchQuery.value.toLowerCase())
-      )
+
+      // 依姓名搜尋
+      if (searchQuery.value) {
+        filtered = filtered.filter(r =>
+          r.name?.toLowerCase().includes(searchQuery.value.toLowerCase())
+        )
+      }
+
+      return filtered
     })
 
     const totalGiftMoney = computed(() => {
@@ -26,14 +36,22 @@ export default {
 
     const groomGiftMoney = computed(() => {
       return responses.value
-        .filter(r => r.guestSide === '新郎')
+        .filter(r => r.side === 'groom')
         .reduce((sum, r) => sum + (r.giftMoney || 0), 0)
     })
 
     const brideGiftMoney = computed(() => {
       return responses.value
-        .filter(r => r.guestSide === '新娘')
+        .filter(r => r.side === 'bride')
         .reduce((sum, r) => sum + (r.giftMoney || 0), 0)
+    })
+
+    const groomCount = computed(() => {
+      return responses.value.filter(r => r.side === 'groom').length
+    })
+
+    const brideCount = computed(() => {
+      return responses.value.filter(r => r.side === 'bride').length
     })
 
     async function loadResponses() {
@@ -85,11 +103,14 @@ export default {
     return {
       responses,
       searchQuery,
+      sideFilter,
       editingResponse,
       filteredResponses,
       totalGiftMoney,
       groomGiftMoney,
       brideGiftMoney,
+      groomCount,
+      brideCount,
       openEditGiftModal,
       saveGiftMoney
     }
