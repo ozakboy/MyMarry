@@ -32,3 +32,4 @@ server/data/responses.json
 data/responses.json
 data/wedding-config.json
 !data/.gitkeep
+data/*
