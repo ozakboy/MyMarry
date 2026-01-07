@@ -13,7 +13,10 @@ export default {
     const editingExpense = ref({})
     const isEditing = ref(false)
     const customCategory = ref('')
+    const totalBudget = ref(0)
+    const editingBudget = ref(0)
     let expenseModalInstance = null
+    let budgetModalInstance = null
     const chartCanvas = ref(null)
     let chartInstance = null
 
@@ -34,6 +37,15 @@ export default {
       return expenses.value.reduce((sum, e) => sum + (e.amount || 0), 0)
     })
 
+    const remainingBudget = computed(() => {
+      return totalBudget.value - totalExpense.value
+    })
+
+    const budgetPercentage = computed(() => {
+      if (totalBudget.value === 0) return 0
+      return Math.round((totalExpense.value / totalBudget.value) * 100)
+    })
+
     const categoryData = computed(() => {
       const categoryMap = {}
       expenses.value.forEach(e => {
@@ -47,10 +59,38 @@ export default {
       try {
         const response = await fetch('/api/expenses')
         if (response.ok) {
-          expenses.value = await response.json()
+          const data = await response.json()
+          expenses.value = data.expenses || []
+          totalBudget.value = data.totalBudget || 0
         }
       } catch (error) {
         console.error('載入花費資料失敗：', error)
+      }
+    }
+
+    function openBudgetModal() {
+      editingBudget.value = totalBudget.value
+      budgetModalInstance.show()
+    }
+
+    async function saveBudget() {
+      try {
+        const response = await fetch('/api/expenses/budget', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ totalBudget: editingBudget.value })
+        })
+
+        if (response.ok) {
+          totalBudget.value = editingBudget.value
+          budgetModalInstance.hide()
+          alert('預算設定成功')
+        }
+      } catch (error) {
+        console.error('儲存預算失敗：', error)
+        alert('儲存預算失敗')
       }
     }
 
@@ -175,10 +215,17 @@ export default {
 
     onMounted(async () => {
       await loadExpenses()
-      const modalElement = document.getElementById('expenseModal')
-      if (modalElement) {
-        expenseModalInstance = new Modal(modalElement)
+
+      const expenseModalElement = document.getElementById('expenseModal')
+      if (expenseModalElement) {
+        expenseModalInstance = new Modal(expenseModalElement)
       }
+
+      const budgetModalElement = document.getElementById('budgetModal')
+      if (budgetModalElement) {
+        budgetModalInstance = new Modal(budgetModalElement)
+      }
+
       updateChart()
     })
 
@@ -187,11 +234,17 @@ export default {
       editingExpense,
       isEditing,
       customCategory,
+      totalBudget,
+      editingBudget,
+      remainingBudget,
+      budgetPercentage,
       chartCanvas,
       categories,
       totalExpense,
       categoryData,
       loadExpenses,
+      openBudgetModal,
+      saveBudget,
       openAddModal,
       openEditModal,
       saveExpense,

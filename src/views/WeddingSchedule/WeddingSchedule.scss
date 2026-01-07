@@ -12,3 +12,16 @@
   background-color: #f8f9fa;
   font-weight: 600;
 }
+
+.table td {
+  vertical-align: top;
+  white-space: pre-line;
+}
+
+.text-wrap {
+  white-space: pre-line;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}

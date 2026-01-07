@@ -2,7 +2,7 @@
 
 基於 Vue 3 + Vite + Express 的婚禮賓客出席回覆系統
 
-**當前版本**: v1.1.0
+**當前版本**: v1.2.0
 
 ## 功能特色
 
@@ -29,7 +29,36 @@
   - 修改邀請函文字內容
   - 修改聯絡資訊
   - 調整預設喜餅數量和每桌人數
-- 💾 **JSON 資料存儲** - 所有資料儲存於 `server/data/responses.json`
+- 🔍 **快速查詢頁面** - 管理員專用（隱藏路由 `/QuickView`）
+  - 快速查看所有賓客出席名單
+  - 男方/女方賓客快速篩選
+  - 姓名搜尋功能
+  - 禮金總額統計（總額、男方、女方分別統計）
+  - 賓客數量統計（總數、男方、女方分別統計）
+  - 可即時編輯禮金金額
+- 💰 **花費統計頁面** - 管理員專用（隱藏路由 `/Expenses`）
+  - 婚禮準備花費分類管理（場地、喜餅、喜帖、佈置、攝影、其他）
+  - 圖形化統計（圓餅圖顯示各類別支出佔比）
+  - 新增/編輯/刪除花費項目
+  - 花費總額即時計算
+- 📅 **婚禮流程頁面** - 管理員專用（隱藏路由 `/WeddingSchedule`）
+  - 訂婚/結婚流程時間表管理
+  - 支援新增/編輯/刪除流程項目
+  - 時間選擇器整合
+  - 流程類型分類（訂婚、結婚）
+- 👥 **人員配置頁面** - 管理員專用（隱藏路由 `/StaffAssignment`）
+  - 婚禮工作人員職責分配管理
+  - 可指定負責人員和備註說明
+  - 新增/編輯/刪除人員配置
+- 🪑 **座位表頁面** - 管理員專用（隱藏路由 `/SeatingChart`）
+  - 賓客座位安排管理
+  - 桌次管理（新增/刪除桌次）
+  - 拖拉式座位分配（支援賓客拖放到桌次）
+  - 即時顯示座位人數（當前/最大，顏色提示）
+  - 未分配賓客列表
+  - 視覺化座位配置介面
+  - 自動安排功能
+- 💾 **JSON 資料存儲** - 所有資料儲存於 `data/` 目錄
 - 📱 **完整 RWD 響應式設計** - 使用 Bootstrap 5
 - ✅ **動態婚禮資訊** - 透過圖形化設定頁面或 `public/wedding-config.json` 修改
 
@@ -112,17 +141,44 @@ node server/index.js
 
 **API 伺服器預設 Port**: 4600 (可透過環境變數 PORT 調整)
 
+**賓客回覆相關**
 - `GET /api/responses` - 取得所有回覆資料
 - `POST /api/responses` - 新增回覆資料
 - `PUT /api/responses/:id` - 更新指定回覆
 - `DELETE /api/responses/:id` - 刪除指定回覆
+
+**系統設定相關**
 - `POST /api/config` - 更新婚禮設定 (wedding-config.json)
+
+**花費統計相關**
+- `GET /api/expenses` - 取得所有花費資料
+- `POST /api/expenses` - 新增花費項目
+- `PUT /api/expenses/:id` - 更新指定花費
+- `DELETE /api/expenses/:id` - 刪除指定花費
+
+**婚禮流程相關**
+- `GET /api/schedule` - 取得所有流程資料
+- `POST /api/schedule` - 新增流程項目
+- `PUT /api/schedule/:id` - 更新指定流程
+- `DELETE /api/schedule/:id` - 刪除指定流程
+
+**人員配置相關**
+- `GET /api/staff` - 取得所有人員配置
+- `POST /api/staff` - 新增人員配置
+- `PUT /api/staff/:id` - 更新指定配置
+- `DELETE /api/staff/:id` - 刪除指定配置
+
+**座位表相關**
+- `GET /api/seating` - 取得座位表資料
+- `POST /api/seating` - 更新座位表資料
 
 ## 技術棧
 
 - **前端**: Vue 3 + Vue Router + Vite + Bootstrap 5
+- **UI 元件**: Chart.js + Vue-Chartjs (圖表)、VueDraggable (拖拉)、Vue Datepicker (日期選擇)
+- **樣式**: SCSS (Sass)
 - **後端**: Node.js + Express
-- **資料存儲**: JSON 檔案
+- **資料存儲**: JSON 檔案 (responses.json, expenses.json, wedding-schedule.json, staff-assignment.json, seating-chart.json)
 - **部署**: Docker / IIS / Node.js
 
 ## 修改婚禮資訊

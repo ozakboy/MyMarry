@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="seating-page">
     <NavBar />
 
@@ -17,27 +17,34 @@
 
           <div class="card mt-3">
             <div class="card-header">
-              <h6 class="mb-0">未安排賓客 ({{ unassignedGuests.length }})</h6>
+              <h6 class="mb-0">未安排座位 ({{ getUnassignedSeatCount() }} 個座位)</h6>
             </div>
             <div class="card-body" style="max-height: 500px; overflow-y: auto;">
-              <div
-                v-for="guest in unassignedGuests"
-                :key="guest.id"
-                class="guest-item mb-2 p-2 border rounded bg-light"
+              <draggable
+                v-model="unassignedGuestsList"
+                :group="{ name: 'guests', pull: 'clone', put: false }"
+                :clone="cloneGuest"
+                item-key="seatId"
+                class="draggable-list"
               >
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <strong>{{ guest.name }}</strong>
-                    <br>
-                    <small class="text-muted">{{ guest.guestSide }} - {{ guest.attendeeCount }}人</small>
+                <template #item="{ element: seat }">
+                  <div class="seat-card mb-2 p-2 border rounded bg-light" style="cursor: move;">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <div>
+                        <strong>{{ seat.guestName }}</strong>
+                        <span class="badge bg-secondary ms-1">{{ seat.seatNumber }}/{{ seat.totalSeats }}</span>
+                        <br>
+                        <small class="text-muted">{{ getSideName(seat.side) }}</small>
+                      </div>
+                      <button class="btn btn-sm btn-outline-primary" @click="showAssignModal(seat)">
+                        安排
+                      </button>
+                    </div>
                   </div>
-                  <button class="btn btn-sm btn-outline-primary" @click="showAssignModal(guest)">
-                    安排
-                  </button>
-                </div>
-              </div>
-              <div v-if="unassignedGuests.length === 0" class="text-center text-muted">
-                <p>所有賓客都已安排</p>
+                </template>
+              </draggable>
+              <div v-if="getUnassignedSeatCount() === 0" class="text-center text-muted">
+                <p>所有座位都已安排</p>
               </div>
             </div>
           </div>
@@ -53,31 +60,38 @@
                 </div>
                 <div class="card-body">
                   <p class="mb-2">
-                    <small>座位: {{ getCurrentSeats(table) }} / {{ table.maxSeats }}</small>
+                    <small class="fw-bold" :class="getSeatColorClass(table)">
+                      座位: {{ getCurrentSeats(table) }} / {{ table.maxSeats }}
+                    </small>
                   </p>
-                  <div class="guests-list">
-                    <div
-                      v-for="(guest, gIndex) in table.guests"
-                      :key="gIndex"
-                      class="guest-item mb-2 p-2 border rounded"
-                    >
-                      <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                          <strong>{{ guest.name }}</strong>
-                          <br>
-                          <small>{{ guest.attendeeCount }}人</small>
+                  <draggable
+                    v-model="table.guests"
+                    group="guests"
+                    item-key="seatId"
+                    class="guests-list"
+                    :class="{ 'empty-table': table.guests.length === 0 }"
+                  >
+                    <template #item="{ element: seat, index: seatIndex }">
+                      <div class="seat-card mb-2 p-2 border rounded" style="cursor: move;">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <strong>{{ seat.guestName }}</strong>
+                            <span class="badge bg-primary ms-1">{{ seat.seatNumber }}/{{ seat.totalSeats }}</span>
+                            <br>
+                            <small class="text-muted">{{ getSideName(seat.side) }}</small>
+                          </div>
+                          <button
+                            class="btn btn-sm btn-outline-danger"
+                            @click="removeGuestFromTable(index, seatIndex)"
+                          >
+                            移除
+                          </button>
                         </div>
-                        <button
-                          class="btn btn-sm btn-outline-danger"
-                          @click="removeGuestFromTable(index, gIndex)"
-                        >
-                          移除
-                        </button>
                       </div>
-                    </div>
-                    <div v-if="table.guests.length === 0" class="text-center text-muted py-3">
-                      <small>尚無賓客</small>
-                    </div>
+                    </template>
+                  </draggable>
+                  <div v-if="table.guests.length === 0" class="text-center text-muted py-3">
+                    <small>拖曳座位到此處</small>
                   </div>
                 </div>
               </div>
@@ -95,7 +109,10 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">安排賓客 - {{ selectedGuest?.name }}</h5>
+            <h5 class="modal-title">
+              安排座位 - {{ selectedGuest?.guestName }}
+              <span class="badge bg-secondary">{{ selectedGuest?.seatNumber }}/{{ selectedGuest?.totalSeats }}</span>
+            </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">

@@ -1,10 +1,11 @@
 ﻿import { ref, computed, onMounted } from 'vue'
 import { Modal } from 'bootstrap'
+import draggable from 'vuedraggable'
 import NavBar from '@/components/NavBar/NavBar.vue'
 
 export default {
   name: 'SeatingChart',
-  components: { NavBar },
+  components: { NavBar, draggable },
   setup() {
     const tables = ref([])
     const responses = ref([])
@@ -14,16 +15,75 @@ export default {
     let seatsPerTable = 10
     let mainTableMaxSeats = 12
 
-    const unassignedGuests = computed(() => {
-      const assignedIds = new Set()
+    const unassignedSeats = computed(() => {
+      const assignedSeatIds = new Set()
       tables.value.forEach(table => {
-        table.guests.forEach(guest => assignedIds.add(guest.id))
+        table.guests.forEach(seat => {
+          if (seat.seatId) {
+            assignedSeatIds.add(seat.seatId)
+          }
+        })
       })
-      return responses.value.filter(r => !assignedIds.has(r.id))
+
+      const seats = []
+      const attendingGuests = responses.value.filter(r => r.willAttend === 'yes')
+
+      attendingGuests.forEach(guest => {
+        const attendeeCount = guest.attendees || 1
+        for (let i = 1; i <= attendeeCount; i++) {
+          const seatId = `${guest.id}-seat-${i}`
+          if (!assignedSeatIds.has(seatId)) {
+            seats.push({
+              seatId: seatId,
+              guestId: guest.id,
+              guestName: guest.name,
+              seatNumber: i,
+              totalSeats: attendeeCount,
+              side: guest.side,
+              originalGuest: guest
+            })
+          }
+        }
+      })
+      return seats
+    })
+
+    const unassignedGuests = computed(() => {
+      const guestIds = new Set()
+      unassignedSeats.value.forEach(seat => {
+        guestIds.add(seat.guestId)
+      })
+      return responses.value.filter(r => guestIds.has(r.id))
+    })
+
+    const unassignedGuestsList = computed({
+      get: () => unassignedSeats.value,
+      set: () => {} // Read-only for draggable clone mode
     })
 
     function getCurrentSeats(table) {
-      return table.guests.reduce((sum, g) => sum + (g.attendeeCount || 0), 0)
+      return table.guests.length
+    }
+
+    function getSideName(side) {
+      return side === 'groom' ? '新郎' : '新娘'
+    }
+
+    function getSeatColorClass(table) {
+      const current = getCurrentSeats(table)
+      const max = table.maxSeats
+      const ratio = current / max
+      if (ratio >= 1) return 'text-danger'
+      if (ratio >= 0.8) return 'text-warning'
+      return 'text-success'
+    }
+
+    function cloneGuest(seat) {
+      return { ...seat }
+    }
+
+    function getUnassignedSeatCount() {
+      return unassignedSeats.value.length
     }
 
     async function loadConfig() {
@@ -79,8 +139,8 @@ export default {
       tables.value.splice(index, 1)
     }
 
-    function showAssignModal(guest) {
-      selectedGuest.value = guest
+    function showAssignModal(seat) {
+      selectedGuest.value = seat
       selectedTableIndex.value = 0
       assignModalInstance.show()
     }
@@ -90,10 +150,9 @@ export default {
 
       const table = tables.value[selectedTableIndex.value]
       const currentSeats = getCurrentSeats(table)
-      const neededSeats = selectedGuest.value.attendeeCount || 0
 
-      if (currentSeats + neededSeats > table.maxSeats) {
-        alert(`座位不足！目前 ${currentSeats}/${table.maxSeats}，需要 ${neededSeats} 個座位`)
+      if (currentSeats + 1 > table.maxSeats) {
+        alert(`座位不足！目前 ${currentSeats}/${table.maxSeats}`)
         return
       }
 
@@ -101,8 +160,8 @@ export default {
       assignModalInstance.hide()
     }
 
-    function removeGuestFromTable(tableIndex, guestIndex) {
-      tables.value[tableIndex].guests.splice(guestIndex, 1)
+    function removeGuestFromTable(tableIndex, seatIndex) {
+      tables.value[tableIndex].guests.splice(seatIndex, 1)
     }
 
     function autoArrange() {
@@ -110,8 +169,9 @@ export default {
 
       tables.value = []
 
-      const groomGuests = responses.value.filter(r => r.guestSide === '新郎')
-      const brideGuests = responses.value.filter(r => r.guestSide === '新娘')
+      const allSeats = unassignedSeats.value
+      const groomSeats = allSeats.filter(s => s.side === 'groom')
+      const brideSeats = allSeats.filter(s => s.side === 'bride')
 
       let tableNum = 1
       const createTable = (isMainTable = false) => ({
@@ -120,25 +180,24 @@ export default {
         guests: []
       })
 
-      const arrangeGuests = (guests) => {
+      const arrangeSeats = (seats) => {
         let currentTable = createTable(tables.value.length === 0)
         tables.value.push(currentTable)
 
-        guests.forEach(guest => {
-          const needed = guest.attendeeCount || 0
+        seats.forEach(seat => {
           const current = getCurrentSeats(currentTable)
 
-          if (current + needed > currentTable.maxSeats) {
+          if (current + 1 > currentTable.maxSeats) {
             currentTable = createTable()
             tables.value.push(currentTable)
           }
 
-          currentTable.guests.push(guest)
+          currentTable.guests.push(seat)
         })
       }
 
-      arrangeGuests(groomGuests)
-      arrangeGuests(brideGuests)
+      arrangeSeats(groomSeats)
+      arrangeSeats(brideSeats)
 
       alert('自動安排完成！')
     }
@@ -184,7 +243,13 @@ export default {
       selectedGuest,
       selectedTableIndex,
       unassignedGuests,
+      unassignedSeats,
+      unassignedGuestsList,
       getCurrentSeats,
+      getSideName,
+      getSeatColorClass,
+      cloneGuest,
+      getUnassignedSeatCount,
       loadConfig,
       loadResponses,
       loadSeating,

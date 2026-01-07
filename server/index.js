@@ -75,7 +75,7 @@ if (!fs.existsSync(configFile)) {
 
 // 初始化其他資料檔案
 if (!fs.existsSync(expensesFile)) {
-  fs.writeFileSync(expensesFile, JSON.stringify([]), 'utf-8')
+  fs.writeFileSync(expensesFile, JSON.stringify({ expenses: [], totalBudget: 0 }), 'utf-8')
   console.log('expenses.json 已初始化')
 }
 
@@ -209,11 +209,40 @@ app.post('/api/config', (req, res) => {
 app.get('/api/expenses', (req, res) => {
   try {
     const data = fs.readFileSync(expensesFile, 'utf-8')
+    let parsedData = JSON.parse(data)
+
+    // 兼容舊格式 (純陣列) 和新格式 (物件含 expenses 和 totalBudget)
+    if (Array.isArray(parsedData)) {
+      parsedData = { expenses: parsedData, totalBudget: 0 }
+    }
+
     res.setHeader('Content-Type', 'application/json; charset=utf-8')
-    res.json(JSON.parse(data))
+    res.json(parsedData)
   } catch (error) {
     console.error('讀取花費資料錯誤：', error)
     res.status(500).json({ error: '讀取花費資料失敗' })
+  }
+})
+
+// 設定總預算
+app.post('/api/expenses/budget', (req, res) => {
+  try {
+    const data = fs.readFileSync(expensesFile, 'utf-8')
+    let parsedData = JSON.parse(data)
+
+    // 兼容舊格式
+    if (Array.isArray(parsedData)) {
+      parsedData = { expenses: parsedData, totalBudget: 0 }
+    }
+
+    parsedData.totalBudget = req.body.totalBudget || 0
+
+    fs.writeFileSync(expensesFile, JSON.stringify(parsedData, null, 2), 'utf-8')
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json({ message: '預算設定成功' })
+  } catch (error) {
+    console.error('設定預算錯誤：', error)
+    res.status(500).json({ error: '設定預算失敗' })
   }
 })
 
@@ -221,7 +250,14 @@ app.get('/api/expenses', (req, res) => {
 app.post('/api/expenses', (req, res) => {
   try {
     const data = fs.readFileSync(expensesFile, 'utf-8')
-    const expenses = JSON.parse(data)
+    let parsedData = JSON.parse(data)
+
+    // 兼容舊格式
+    if (Array.isArray(parsedData)) {
+      parsedData = { expenses: parsedData, totalBudget: 0 }
+    }
+
+    const expenses = parsedData.expenses
 
     const newExpense = {
       id: Date.now(),
@@ -229,7 +265,8 @@ app.post('/api/expenses', (req, res) => {
     }
 
     expenses.push(newExpense)
-    fs.writeFileSync(expensesFile, JSON.stringify(expenses, null, 2), 'utf-8')
+    parsedData.expenses = expenses
+    fs.writeFileSync(expensesFile, JSON.stringify(parsedData, null, 2), 'utf-8')
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8')
     res.status(201).json({ message: '花費新增成功', data: newExpense })
@@ -243,7 +280,14 @@ app.post('/api/expenses', (req, res) => {
 app.put('/api/expenses/:id', (req, res) => {
   try {
     const data = fs.readFileSync(expensesFile, 'utf-8')
-    const expenses = JSON.parse(data)
+    let parsedData = JSON.parse(data)
+
+    // 兼容舊格式
+    if (Array.isArray(parsedData)) {
+      parsedData = { expenses: parsedData, totalBudget: 0 }
+    }
+
+    const expenses = parsedData.expenses
 
     const index = expenses.findIndex(e => e.id === parseInt(req.params.id))
     if (index === -1) {
@@ -256,7 +300,8 @@ app.put('/api/expenses/:id', (req, res) => {
       id: expenses[index].id
     }
 
-    fs.writeFileSync(expensesFile, JSON.stringify(expenses, null, 2), 'utf-8')
+    parsedData.expenses = expenses
+    fs.writeFileSync(expensesFile, JSON.stringify(parsedData, null, 2), 'utf-8')
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8')
     res.json({ message: '花費更新成功', data: expenses[index] })
@@ -270,10 +315,17 @@ app.put('/api/expenses/:id', (req, res) => {
 app.delete('/api/expenses/:id', (req, res) => {
   try {
     const data = fs.readFileSync(expensesFile, 'utf-8')
-    const expenses = JSON.parse(data)
+    let parsedData = JSON.parse(data)
 
+    // 兼容舊格式
+    if (Array.isArray(parsedData)) {
+      parsedData = { expenses: parsedData, totalBudget: 0 }
+    }
+
+    const expenses = parsedData.expenses
     const filteredExpenses = expenses.filter(e => e.id !== parseInt(req.params.id))
-    fs.writeFileSync(expensesFile, JSON.stringify(filteredExpenses, null, 2), 'utf-8')
+    parsedData.expenses = filteredExpenses
+    fs.writeFileSync(expensesFile, JSON.stringify(parsedData, null, 2), 'utf-8')
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8')
     res.json({ message: '花費刪除成功' })

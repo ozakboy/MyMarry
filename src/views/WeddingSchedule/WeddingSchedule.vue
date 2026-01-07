@@ -17,31 +17,31 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th>活動類型</th>
-                  <th>日期時間</th>
-                  <th>地點</th>
-                  <th>活動名稱</th>
-                  <th>工作內容</th>
-                  <th>負責人員</th>
-                  <th>需求物品</th>
-                  <th>備註</th>
-                  <th>操作</th>
+                  <th style="width: 80px;">類型</th>
+                  <th style="width: 140px;">日期時間</th>
+                  <th style="width: 120px;">地點</th>
+                  <th style="width: 120px;">活動名稱</th>
+                  <th style="width: 200px;">工作內容</th>
+                  <th style="width: 100px;">負責人員</th>
+                  <th style="width: 150px;">需求物品</th>
+                  <th style="width: 150px;">備註</th>
+                  <th style="width: 140px;">操作</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="item in sortedSchedule" :key="item.id">
-                  <td>
+                  <td style="white-space: normal;">
                     <span class="badge bg-info">{{ item.activityType }}</span>
                   </td>
-                  <td>{{ formatDateTime(item.datetime) }}</td>
+                  <td style="white-space: nowrap;">{{ formatDateTime(item.datetime) }}</td>
                   <td>{{ item.location }}</td>
                   <td class="fw-bold">{{ item.activityName }}</td>
                   <td>{{ item.workDetails }}</td>
                   <td>{{ item.staff }}</td>
                   <td>{{ item.requiredItems }}</td>
                   <td>{{ item.note }}</td>
-                  <td>
-                    <button class="btn btn-sm btn-outline-primary me-2" @click="openEditModal(item)">編輯</button>
+                  <td style="white-space: nowrap;">
+                    <button class="btn btn-sm btn-outline-primary me-1" @click="openEditModal(item)">編輯</button>
                     <button class="btn btn-sm btn-outline-danger" @click="deleteSchedule(item.id)">刪除</button>
                   </td>
                 </tr>

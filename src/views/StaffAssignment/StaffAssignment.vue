@@ -17,11 +17,11 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th>名稱</th>
-                  <th>人員</th>
-                  <th>職責</th>
-                  <th>備註</th>
-                  <th>操作</th>
+                  <th style="width: 150px;">名稱</th>
+                  <th style="width: 200px;">人員</th>
+                  <th style="width: 300px;">職責</th>
+                  <th style="width: 200px;">備註</th>
+                  <th style="width: 140px;">操作</th>
                 </tr>
               </thead>
               <tbody>
@@ -30,8 +30,8 @@
                   <td>{{ staff.personnel }}</td>
                   <td>{{ staff.responsibilities }}</td>
                   <td>{{ staff.note }}</td>
-                  <td>
-                    <button class="btn btn-sm btn-outline-primary me-2" @click="openEditModal(staff)">編輯</button>
+                  <td style="white-space: nowrap;">
+                    <button class="btn btn-sm btn-outline-primary me-1" @click="openEditModal(staff)">編輯</button>
                     <button class="btn btn-sm btn-outline-danger" @click="deleteStaff(staff.id)">刪除</button>
                   </td>
                 </tr>
