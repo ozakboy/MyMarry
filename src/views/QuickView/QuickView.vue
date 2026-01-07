@@ -60,7 +60,7 @@
           <div class="card text-center">
             <div class="card-body">
               <h5 class="card-title">新娘方禮金</h5>
-              <p class="card-text fs-3 fw-bold" style="color: #d4357f;">${{ brideGiftMoney.toLocaleString() }}</p>
+              <p class="card-text fs-3 fw-bold bride-gift-money">${{ brideGiftMoney.toLocaleString() }}</p>
             </div>
           </div>
         </div>
@@ -161,100 +161,6 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, onMounted } from 'vue'
-import { Modal } from 'bootstrap'
+<script src="./QuickView.js"></script>
 
-const responses = ref([])
-const searchQuery = ref('')
-const editingResponse = ref({})
-let editGiftModalInstance = null
-
-const filteredResponses = computed(() => {
-  if (!searchQuery.value) {
-    return responses.value
-  }
-  return responses.value.filter(r =>
-    r.name?.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
-})
-
-const totalGiftMoney = computed(() => {
-  return responses.value.reduce((sum, r) => sum + (r.giftMoney || 0), 0)
-})
-
-const groomGiftMoney = computed(() => {
-  return responses.value
-    .filter(r => r.guestSide === '新郎')
-    .reduce((sum, r) => sum + (r.giftMoney || 0), 0)
-})
-
-const brideGiftMoney = computed(() => {
-  return responses.value
-    .filter(r => r.guestSide === '新娘')
-    .reduce((sum, r) => sum + (r.giftMoney || 0), 0)
-})
-
-async function loadResponses() {
-  try {
-    const response = await fetch('http://localhost:4600/api/responses')
-    if (response.ok) {
-      responses.value = await response.json()
-    }
-  } catch (error) {
-    console.error('載入資料失敗：', error)
-    alert('載入資料失敗')
-  }
-}
-
-function openEditGiftModal(response) {
-  editingResponse.value = { ...response }
-  editGiftModalInstance.show()
-}
-
-async function saveGiftMoney() {
-  try {
-    const response = await fetch(`http://localhost:4600/api/responses/${editingResponse.value.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(editingResponse.value)
-    })
-
-    if (response.ok) {
-      await loadResponses()
-      editGiftModalInstance.hide()
-      alert('禮金更新成功')
-    }
-  } catch (error) {
-    console.error('更新禮金失敗：', error)
-    alert('更新禮金失敗')
-  }
-}
-
-onMounted(async () => {
-  await loadResponses()
-  const modalElement = document.getElementById('editGiftModal')
-  if (modalElement) {
-    editGiftModalInstance = new Modal(modalElement)
-  }
-})
-</script>
-
-<style scoped>
-.quick-view-page {
-  min-height: 100vh;
-  background-color: #f8f9fa;
-}
-
-.card {
-  border: none;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.table th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-}
-</style>
+<style src="./QuickView.scss" scoped lang="scss"></style>

@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
-import Form from '../views/Form.vue'
-import Admin from '../views/Admin.vue'
-import Settings from '../views/Settings.vue'
-import QuickView from '../views/QuickView.vue'
-import Expenses from '../views/Expenses.vue'
-import WeddingSchedule from '../views/WeddingSchedule.vue'
-import StaffAssignment from '../views/StaffAssignment.vue'
-import SeatingChart from '../views/SeatingChart.vue'
+import Home from '../views/Home/Home.vue'
+import Form from '../views/Form/Form.vue'
+import Admin from '../views/Admin/Admin.vue'
+import Settings from '../views/Settings/Settings.vue'
+import QuickView from '../views/QuickView/QuickView.vue'
+import Expenses from '../views/Expenses/Expenses.vue'
+import WeddingSchedule from '../views/WeddingSchedule/WeddingSchedule.vue'
+import StaffAssignment from '../views/StaffAssignment/StaffAssignment.vue'
+import SeatingChart from '../views/SeatingChart/SeatingChart.vue'
 
 const routes = [
   {

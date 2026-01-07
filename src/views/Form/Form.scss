@@ -1,0 +1,14 @@
+.form-control:focus,
+.form-select:focus {
+  border-color: #ff69b4;
+  box-shadow: 0 0 0 0.25rem rgba(255, 105, 180, 0.25);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #ff69b4 0%, #d4357f 100%);
+  border: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #ff85c0 0%, #e04990 100%);
+}

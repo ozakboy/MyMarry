@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="min-vh-100 d-flex align-items-center" style="background: linear-gradient(135deg, #ffd1dc 0%, #ffb6c1 100%);">
     <div class="container">
       <div class="row justify-content-center">
@@ -8,7 +8,7 @@
               <!-- 標題區 -->
               <div class="text-center mb-3 mb-md-4">
                 <h1 class="display-4 fw-bold mb-2 mb-md-3" style="color: #d4357f;">💒 婚禮邀請 💒</h1>
-                <p class="lead text-muted mb-3 mb-md-4" v-if="weddingInfo">{{ weddingInfo.invitation?.greeting || '親愛的朋友：' }}</p>
+                <p class="lead text-muted mb-3 mb-md-4" v-if="weddingInfo">{{ weddingInfo.invitation?.greeting || '親愛的朋友:' }}</p>
                 <p class="fs-5 mb-0" style="white-space: pre-line;" v-if="weddingInfo">
                   {{ weddingInfo.invitation?.message || '我們即將攜手步入人生的新階段\n誠摯邀請您蒞臨見證我們的幸福時刻' }}
                 </p>
@@ -81,10 +81,10 @@
 
               <!-- 聯絡資訊 -->
               <div class="text-center mt-3 mt-md-4 pt-3 pt-md-4 border-top" v-if="weddingInfo?.contact">
-                <p class="text-muted small mb-2">- 如有任何問題 ， 歡迎聯絡我們 -</p>
+                <p class="text-muted small mb-2">- 如有任何問題 , 歡迎聯絡我們 -</p>
                 <p class="text-muted small mb-0" v-if="weddingInfo.contact.groomPhone || weddingInfo.contact.bridePhone">
-                  新郎：{{ weddingInfo.contact.groomPhone || 'N/A' }} |
-                  新娘：{{ weddingInfo.contact.bridePhone || 'N/A' }}
+                  新郎:{{ weddingInfo.contact.groomPhone || 'N/A' }} |
+                  新娘:{{ weddingInfo.contact.bridePhone || 'N/A' }}
                 </p>
                 <p class="text-muted small mb-0" v-if="weddingInfo.contact.email">
                   Email: {{ weddingInfo.contact.email }}
@@ -98,43 +98,6 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script src="./Home.js"></script>
 
-const weddingInfo = ref(null)
-
-onMounted(async () => {
-  try {
-    const response = await fetch('/api/config')
-    weddingInfo.value = await response.json()
-  } catch (error) {
-    console.error('載入婚禮資訊失敗：', error)
-    // 如果 API 失敗，嘗試從靜態檔案讀取（開發環境備用）
-    try {
-      const fallbackResponse = await fetch('/wedding-config.json')
-      weddingInfo.value = await fallbackResponse.json()
-    } catch (fallbackError) {
-      console.error('備用載入也失敗：', fallbackError)
-    }
-  }
-})
-</script>
-
-<style scoped>
-.card {
-  transition: transform 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-}
-
-.btn {
-  transition: all 0.3s ease;
-}
-
-.btn:hover {
-  transform: scale(1.05);
-  opacity: 0.9;
-}
-</style>
+<style src="./Home.scss" scoped></style>

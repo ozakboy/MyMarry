@@ -1,0 +1,26 @@
+.seating-page {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table-card {
+  height: 100%;
+}
+
+.guest-item {
+  cursor: move;
+  transition: all 0.2s;
+}
+
+.guest-item:hover {
+  background-color: #e9ecef;
+}
+
+.guests-list {
+  min-height: 100px;
+}

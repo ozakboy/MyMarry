@@ -141,7 +141,7 @@
                   <div class="row g-3">
                     <div class="col-md-12">
                       <label class="form-label fw-bold">開頭問候語</label>
-                      <input type="text" class="form-control" v-model="weddingConfig.invitation.greeting" placeholder="例: 親愛的朋友：">
+                      <input type="text" class="form-control" v-model="weddingConfig.invitation.greeting" placeholder="例: 親愛的朋友:">
                     </div>
                     <div class="col-md-12">
                       <label class="form-label fw-bold">邀請訊息</label>
@@ -224,8 +224,8 @@
               <!-- 提示訊息 -->
               <div class="alert alert-info mt-3 mb-0">
                 <small>
-                  <strong>📌 提示：</strong>
-                  修改後請點擊「儲存設定」按鈕，設定會立即生效於首頁和表單頁面。
+                  <strong>📌 提示:</strong>
+                  修改後請點擊「儲存設定」按鈕,設定會立即生效於首頁和表單頁面。
                 </small>
               </div>
             </div>
@@ -236,137 +236,6 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
+<script src="./Settings.js"></script>
 
-const isSaving = ref(false)
-const weddingConfig = ref({
-  groom: {
-    name: '',
-    fullName: ''
-  },
-  bride: {
-    name: '',
-    fullName: ''
-  },
-  wedding: {
-    date: '',
-    dayOfWeek: '',
-    time: '',
-    venue: {
-      name: '',
-      type: '',
-      address: '',
-      floor: '',
-      phone: '',
-      googleMapUrl: ''
-    }
-  },
-  invitation: {
-    greeting: '',
-    message: '',
-    rsvpText: ''
-  },
-  contact: {
-    groomPhone: '',
-    bridePhone: '',
-    email: ''
-  },
-  defaultCookieCount: 1,
-  seatsPerTable: 10
-})
-
-// 載入設定
-const loadConfig = async () => {
-  try {
-    const response = await fetch('/api/config')
-    const config = await response.json()
-    weddingConfig.value = config
-  } catch (error) {
-    console.error('載入設定錯誤：', error)
-    alert('載入設定失敗')
-  }
-}
-
-// 儲存設定
-const saveConfig = async () => {
-  isSaving.value = true
-
-  try {
-    const response = await fetch('/api/config', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8'
-      },
-      body: JSON.stringify(weddingConfig.value)
-    })
-
-    if (response.ok) {
-      alert('設定儲存成功! ✅')
-    } else {
-      throw new Error('儲存失敗')
-    }
-  } catch (error) {
-    console.error('儲存設定錯誤：', error)
-    alert('儲存設定失敗')
-  } finally {
-    isSaving.value = false
-  }
-}
-
-onMounted(() => {
-  loadConfig()
-})
-</script>
-
-<style scoped>
-/* 導航列樣式 */
-.navbar {
-  margin-bottom: 0;
-}
-
-.navbar-brand {
-  font-size: 1.25rem;
-}
-
-.nav-link {
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.nav-link:hover {
-  color: #5f9ea0 !important;
-  transform: translateY(-2px);
-}
-
-.nav-link.active {
-  color: #5f9ea0 !important;
-  font-weight: 600;
-}
-
-/* 卡片樣式 */
-.card {
-  transition: transform 0.2s;
-}
-
-.form-control:focus,
-.form-select:focus {
-  border-color: #5f9ea0;
-  box-shadow: 0 0 0 0.25rem rgba(95, 158, 160, 0.25);
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #5f9ea0 0%, #4a7a7c 100%);
-  border: none;
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, #4a7a7c 0%, #3d6365 100%);
-}
-
-@media (max-width: 768px) {
-  .navbar-brand {
-    font-size: 1rem;
-  }
-}
-</style>
+<style src="./Settings.scss" scoped></style>
