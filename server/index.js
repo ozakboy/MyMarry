@@ -28,6 +28,23 @@ const configFile = process.env.NODE_ENV === 'production'
 
 console.log('config file path:', configFile)
 
+// 其他資料檔案路徑
+const expensesFile = process.env.NODE_ENV === 'production'
+  ? '/app/data/expenses.json'
+  : path.join(__dirname, '..', 'data', 'expenses.json')
+
+const scheduleFile = process.env.NODE_ENV === 'production'
+  ? '/app/data/wedding-schedule.json'
+  : path.join(__dirname, '..', 'data', 'wedding-schedule.json')
+
+const staffFile = process.env.NODE_ENV === 'production'
+  ? '/app/data/staff-assignment.json'
+  : path.join(__dirname, '..', 'data', 'staff-assignment.json')
+
+const seatingFile = process.env.NODE_ENV === 'production'
+  ? '/app/data/seating-chart.json'
+  : path.join(__dirname, '..', 'data', 'seating-chart.json')
+
 // 初始化資料檔案
 const dataDir = path.dirname(dataFile)
 if (!fs.existsSync(dataDir)) {
@@ -54,6 +71,27 @@ if (!fs.existsSync(configFile)) {
   } else {
     console.error('找不到預設的 wedding-config.json 範本:', defaultConfigPath)
   }
+}
+
+// 初始化其他資料檔案
+if (!fs.existsSync(expensesFile)) {
+  fs.writeFileSync(expensesFile, JSON.stringify([]), 'utf-8')
+  console.log('expenses.json 已初始化')
+}
+
+if (!fs.existsSync(scheduleFile)) {
+  fs.writeFileSync(scheduleFile, JSON.stringify([]), 'utf-8')
+  console.log('wedding-schedule.json 已初始化')
+}
+
+if (!fs.existsSync(staffFile)) {
+  fs.writeFileSync(staffFile, JSON.stringify([]), 'utf-8')
+  console.log('staff-assignment.json 已初始化')
+}
+
+if (!fs.existsSync(seatingFile)) {
+  fs.writeFileSync(seatingFile, JSON.stringify({ tables: [], unassigned: [] }), 'utf-8')
+  console.log('seating-chart.json 已初始化')
 }
 
 // 讀取所有回覆資料
@@ -163,6 +201,269 @@ app.post('/api/config', (req, res) => {
   } catch (error) {
     console.error('更新設定錯誤：', error)
     res.status(500).json({ error: '設定更新失敗' })
+  }
+})
+
+// ========== 花費統計 API ==========
+// 讀取所有花費
+app.get('/api/expenses', (req, res) => {
+  try {
+    const data = fs.readFileSync(expensesFile, 'utf-8')
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json(JSON.parse(data))
+  } catch (error) {
+    console.error('讀取花費資料錯誤：', error)
+    res.status(500).json({ error: '讀取花費資料失敗' })
+  }
+})
+
+// 新增花費
+app.post('/api/expenses', (req, res) => {
+  try {
+    const data = fs.readFileSync(expensesFile, 'utf-8')
+    const expenses = JSON.parse(data)
+
+    const newExpense = {
+      id: Date.now(),
+      ...req.body
+    }
+
+    expenses.push(newExpense)
+    fs.writeFileSync(expensesFile, JSON.stringify(expenses, null, 2), 'utf-8')
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.status(201).json({ message: '花費新增成功', data: newExpense })
+  } catch (error) {
+    console.error('新增花費錯誤：', error)
+    res.status(500).json({ error: '新增花費失敗' })
+  }
+})
+
+// 更新花費
+app.put('/api/expenses/:id', (req, res) => {
+  try {
+    const data = fs.readFileSync(expensesFile, 'utf-8')
+    const expenses = JSON.parse(data)
+
+    const index = expenses.findIndex(e => e.id === parseInt(req.params.id))
+    if (index === -1) {
+      return res.status(404).json({ error: '找不到該花費' })
+    }
+
+    expenses[index] = {
+      ...expenses[index],
+      ...req.body,
+      id: expenses[index].id
+    }
+
+    fs.writeFileSync(expensesFile, JSON.stringify(expenses, null, 2), 'utf-8')
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json({ message: '花費更新成功', data: expenses[index] })
+  } catch (error) {
+    console.error('更新花費錯誤：', error)
+    res.status(500).json({ error: '更新花費失敗' })
+  }
+})
+
+// 刪除花費
+app.delete('/api/expenses/:id', (req, res) => {
+  try {
+    const data = fs.readFileSync(expensesFile, 'utf-8')
+    const expenses = JSON.parse(data)
+
+    const filteredExpenses = expenses.filter(e => e.id !== parseInt(req.params.id))
+    fs.writeFileSync(expensesFile, JSON.stringify(filteredExpenses, null, 2), 'utf-8')
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json({ message: '花費刪除成功' })
+  } catch (error) {
+    console.error('刪除花費錯誤：', error)
+    res.status(500).json({ error: '刪除花費失敗' })
+  }
+})
+
+// ========== 婚禮流程 API ==========
+// 讀取所有流程
+app.get('/api/schedule', (req, res) => {
+  try {
+    const data = fs.readFileSync(scheduleFile, 'utf-8')
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json(JSON.parse(data))
+  } catch (error) {
+    console.error('讀取流程資料錯誤：', error)
+    res.status(500).json({ error: '讀取流程資料失敗' })
+  }
+})
+
+// 新增流程
+app.post('/api/schedule', (req, res) => {
+  try {
+    const data = fs.readFileSync(scheduleFile, 'utf-8')
+    const schedule = JSON.parse(data)
+
+    const newItem = {
+      id: Date.now(),
+      ...req.body
+    }
+
+    schedule.push(newItem)
+    fs.writeFileSync(scheduleFile, JSON.stringify(schedule, null, 2), 'utf-8')
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.status(201).json({ message: '流程新增成功', data: newItem })
+  } catch (error) {
+    console.error('新增流程錯誤：', error)
+    res.status(500).json({ error: '新增流程失敗' })
+  }
+})
+
+// 更新流程
+app.put('/api/schedule/:id', (req, res) => {
+  try {
+    const data = fs.readFileSync(scheduleFile, 'utf-8')
+    const schedule = JSON.parse(data)
+
+    const index = schedule.findIndex(s => s.id === parseInt(req.params.id))
+    if (index === -1) {
+      return res.status(404).json({ error: '找不到該流程' })
+    }
+
+    schedule[index] = {
+      ...schedule[index],
+      ...req.body,
+      id: schedule[index].id
+    }
+
+    fs.writeFileSync(scheduleFile, JSON.stringify(schedule, null, 2), 'utf-8')
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json({ message: '流程更新成功', data: schedule[index] })
+  } catch (error) {
+    console.error('更新流程錯誤：', error)
+    res.status(500).json({ error: '更新流程失敗' })
+  }
+})
+
+// 刪除流程
+app.delete('/api/schedule/:id', (req, res) => {
+  try {
+    const data = fs.readFileSync(scheduleFile, 'utf-8')
+    const schedule = JSON.parse(data)
+
+    const filteredSchedule = schedule.filter(s => s.id !== parseInt(req.params.id))
+    fs.writeFileSync(scheduleFile, JSON.stringify(filteredSchedule, null, 2), 'utf-8')
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json({ message: '流程刪除成功' })
+  } catch (error) {
+    console.error('刪除流程錯誤：', error)
+    res.status(500).json({ error: '刪除流程失敗' })
+  }
+})
+
+// ========== 人員配置 API ==========
+// 讀取所有人員配置
+app.get('/api/staff', (req, res) => {
+  try {
+    const data = fs.readFileSync(staffFile, 'utf-8')
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json(JSON.parse(data))
+  } catch (error) {
+    console.error('讀取人員配置錯誤：', error)
+    res.status(500).json({ error: '讀取人員配置失敗' })
+  }
+})
+
+// 新增人員配置
+app.post('/api/staff', (req, res) => {
+  try {
+    const data = fs.readFileSync(staffFile, 'utf-8')
+    const staff = JSON.parse(data)
+
+    const newStaff = {
+      id: Date.now(),
+      ...req.body
+    }
+
+    staff.push(newStaff)
+    fs.writeFileSync(staffFile, JSON.stringify(staff, null, 2), 'utf-8')
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.status(201).json({ message: '人員配置新增成功', data: newStaff })
+  } catch (error) {
+    console.error('新增人員配置錯誤：', error)
+    res.status(500).json({ error: '新增人員配置失敗' })
+  }
+})
+
+// 更新人員配置
+app.put('/api/staff/:id', (req, res) => {
+  try {
+    const data = fs.readFileSync(staffFile, 'utf-8')
+    const staff = JSON.parse(data)
+
+    const index = staff.findIndex(s => s.id === parseInt(req.params.id))
+    if (index === -1) {
+      return res.status(404).json({ error: '找不到該人員配置' })
+    }
+
+    staff[index] = {
+      ...staff[index],
+      ...req.body,
+      id: staff[index].id
+    }
+
+    fs.writeFileSync(staffFile, JSON.stringify(staff, null, 2), 'utf-8')
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json({ message: '人員配置更新成功', data: staff[index] })
+  } catch (error) {
+    console.error('更新人員配置錯誤：', error)
+    res.status(500).json({ error: '更新人員配置失敗' })
+  }
+})
+
+// 刪除人員配置
+app.delete('/api/staff/:id', (req, res) => {
+  try {
+    const data = fs.readFileSync(staffFile, 'utf-8')
+    const staff = JSON.parse(data)
+
+    const filteredStaff = staff.filter(s => s.id !== parseInt(req.params.id))
+    fs.writeFileSync(staffFile, JSON.stringify(filteredStaff, null, 2), 'utf-8')
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json({ message: '人員配置刪除成功' })
+  } catch (error) {
+    console.error('刪除人員配置錯誤：', error)
+    res.status(500).json({ error: '刪除人員配置失敗' })
+  }
+})
+
+// ========== 座位表 API ==========
+// 讀取座位表
+app.get('/api/seating', (req, res) => {
+  try {
+    const data = fs.readFileSync(seatingFile, 'utf-8')
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json(JSON.parse(data))
+  } catch (error) {
+    console.error('讀取座位表錯誤：', error)
+    res.status(500).json({ error: '讀取座位表失敗' })
+  }
+})
+
+// 更新座位表
+app.post('/api/seating', (req, res) => {
+  try {
+    fs.writeFileSync(seatingFile, JSON.stringify(req.body, null, 2), 'utf-8')
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    res.json({ message: '座位表更新成功' })
+  } catch (error) {
+    console.error('更新座位表錯誤：', error)
+    res.status(500).json({ error: '更新座位表失敗' })
   }
 })
 

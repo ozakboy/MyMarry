@@ -3,6 +3,11 @@ import Home from '../views/Home.vue'
 import Form from '../views/Form.vue'
 import Admin from '../views/Admin.vue'
 import Settings from '../views/Settings.vue'
+import QuickView from '../views/QuickView.vue'
+import Expenses from '../views/Expenses.vue'
+import WeddingSchedule from '../views/WeddingSchedule.vue'
+import StaffAssignment from '../views/StaffAssignment.vue'
+import SeatingChart from '../views/SeatingChart.vue'
 
 const routes = [
   {
@@ -24,6 +29,31 @@ const routes = [
     path: '/Settings',
     name: 'Settings',
     component: Settings
+  },
+  {
+    path: '/QuickView',
+    name: 'QuickView',
+    component: QuickView
+  },
+  {
+    path: '/Expenses',
+    name: 'Expenses',
+    component: Expenses
+  },
+  {
+    path: '/WeddingSchedule',
+    name: 'WeddingSchedule',
+    component: WeddingSchedule
+  },
+  {
+    path: '/StaffAssignment',
+    name: 'StaffAssignment',
+    component: StaffAssignment
+  },
+  {
+    path: '/SeatingChart',
+    name: 'SeatingChart',
+    component: SeatingChart
   }
 ]
 
