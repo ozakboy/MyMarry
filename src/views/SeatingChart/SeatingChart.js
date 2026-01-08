@@ -404,7 +404,7 @@ export default {
           format: 'a4'
         })
 
-        const tablesPerPage = 10
+        const tablesPerPage = 15
         const totalPages = Math.ceil(tables.value.length / tablesPerPage)
 
         // 為每一頁生成內容
