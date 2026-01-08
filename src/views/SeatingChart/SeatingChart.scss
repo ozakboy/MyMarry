@@ -49,20 +49,30 @@
 }
 
 .sortable-ghost {
-  opacity: 0.5;
-  background-color: #007bff;
+  opacity: 0.4;
+}
+
+.sortable-chosen {
+  opacity: 1;
 }
 
 .sortable-drag {
-  opacity: 0.8;
+  opacity: 0.9;
+  transform: rotate(2deg);
 }
 
 .drag-handle {
   color: #6c757d;
   cursor: move;
-  font-size: 18px;
+  font-size: 20px;
+  transition: color 0.2s;
 }
 
 .drag-handle:hover {
-  color: #495057;
+  color: #007bff;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
 }

@@ -58,10 +58,13 @@
             </button>
           </div>
           <draggable
-            v-model="tables"
+            :list="tables"
             item-key="id"
             class="row"
             handle=".drag-handle"
+            ghost-class="sortable-ghost"
+            chosen-class="sortable-chosen"
+            drag-class="sortable-drag"
             @end="onTableReorder"
           >
             <template #item="{ element: table, index }">
@@ -69,7 +72,7 @@
                 <div class="card table-card">
                   <div class="card-header d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center flex-grow-1">
-                      <i class="bi bi-grip-vertical drag-handle me-2" style="cursor: move;" title="拖曳排序"></i>
+                      <i class="bi bi-grip-vertical drag-handle me-2" style="cursor: move; font-size: 20px;" title="拖曳排序"></i>
                       <h6 class="mb-0" @click="editTableName(index)" style="cursor: pointer;" title="點擊編輯桌名">
                         {{ table.name }}
                         <i class="bi bi-pencil-square ms-1 small"></i>

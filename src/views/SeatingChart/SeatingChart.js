@@ -2,8 +2,8 @@
 import { Modal } from 'bootstrap'
 import draggable from 'vuedraggable'
 import NavBar from '@/components/NavBar/NavBar.vue'
-import jsPDF from 'jspdf'
-import 'jspdf-autotable'
+import { jsPDF } from 'jspdf'
+import html2canvas from 'html2canvas'
 
 export default {
   name: 'SeatingChart',
@@ -392,155 +392,118 @@ export default {
       console.log('桌次順序已更新')
     }
 
-    function exportToPDF() {
-      const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      })
+    async function exportToPDF() {
+      try {
+        // 建立臨時的 HTML 容器
+        const container = document.createElement('div')
+        container.style.position = 'absolute'
+        container.style.left = '-9999px'
+        container.style.top = '0'
+        container.style.width = '1000px'
+        container.style.backgroundColor = '#ffffff'
+        container.style.padding = '20px'
+        container.style.fontFamily = 'Microsoft YaHei, Arial, sans-serif'
 
-      // 使用內建字體繪製中文（使用 Unicode 方式）
-      doc.setFont('helvetica')
+        // 找出最多賓客的桌次數量，以決定需要多少欄位
+        const maxGuests = Math.max(...tables.value.map(t => t.guests.length), 1)
 
-      // 設定標題
-      doc.setFontSize(20)
-      // 使用 text API 的 unicode 支援
-      const title = '婚禮座位表'
-      doc.text(title, 105, 15, { align: 'center' })
+        // 組裝 HTML 內容 - 使用多欄位表格
+        let htmlContent = `
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="font-size: 28px; margin-bottom: 15px; font-weight: bold;">婚禮座位表</h1>
+          </div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <thead>
+              <tr style="background-color: #FF9999; color: #333;">
+                <th style="border: 2px solid #333; padding: 8px; text-align: center; width: 60px; font-weight: bold;">桌次</th>
+                <th style="border: 2px solid #333; padding: 8px; text-align: center; width: 100px; font-weight: bold;">桌名</th>
+        `
 
-      doc.setFontSize(12)
-      const dateText = `產生日期：${new Date().toLocaleDateString('zh-TW')}`
-      doc.text(dateText, 105, 25, { align: 'center' })
-
-      let yPosition = 35
-
-      // 統計資訊
-      const totalGuests = tables.value.reduce((sum, table) => sum + table.guests.length, 0)
-      const totalVegetarian = tables.value.reduce((sum, table) =>
-        sum + table.guests.filter(g => g.mealType === '素食').length, 0
-      )
-      const totalMeat = tables.value.reduce((sum, table) =>
-        sum + table.guests.filter(g => g.mealType === '葷食').length, 0
-      )
-
-      doc.setFontSize(10)
-      doc.text(`總座位數：${totalGuests} | 葷食：${totalMeat} | 素食：${totalVegetarian}`, 15, yPosition)
-      yPosition += 10
-
-      // 為每個桌次生成表格
-      tables.value.forEach((table, tableIndex) => {
-        // 檢查是否需要換頁
-        if (yPosition > 250) {
-          doc.addPage()
-          yPosition = 20
+        // 動態生成賓客欄位標題
+        for (let i = 1; i <= maxGuests; i++) {
+          htmlContent += `<th style="border: 2px solid #333; padding: 8px; text-align: center; font-weight: bold;">賓客${i}</th>`
         }
 
-        // 桌次標題
-        doc.setFontSize(14)
-        const tableTypeText = table.tableType === 'vegetarian' ? '(素桌)' : table.tableType === 'meat' ? '(葷桌)' : ''
-        doc.text(`${table.name} ${tableTypeText}`, 15, yPosition)
-        yPosition += 3
+        htmlContent += `
+              </tr>
+            </thead>
+            <tbody>
+        `
 
-        doc.setFontSize(10)
-        const vegetarianCount = table.guests.filter(g => g.mealType === '素食').length
-        const meatCount = table.guests.filter(g => g.mealType === '葷食').length
-        doc.text(`座位：${table.guests.length}/${table.maxSeats} | 葷：${meatCount} | 素：${vegetarianCount}`, 15, yPosition)
-        yPosition += 7
+        // 為每個桌次生成內容
+        tables.value.forEach((table, tableIndex) => {
+          const tableNumber = `第${tableIndex + 1}桌`
+          const tableTypeText = table.tableType === 'vegetarian' ? ' (素桌)' : table.tableType === 'meat' ? ' (葷桌)' : ''
+          const tableName = table.name + tableTypeText
 
-        // 賓客列表
-        if (table.guests.length > 0) {
-          const tableData = table.guests.map((guest, index) => [
-            (index + 1).toString(),
-            guest.guestName,
-            getSideName(guest.side),
-            guest.mealType || '未設定',
-            guest.seatNumber > 1 ? `${guest.seatNumber}/${guest.totalSeats}` : '-'
-          ])
+          htmlContent += `
+            <tr style="background-color: ${tableIndex % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
+              <td style="border: 2px solid #333; padding: 8px; text-align: center; font-weight: bold;">${tableNumber}</td>
+              <td style="border: 2px solid #333; padding: 8px; text-align: center; font-weight: bold;">${tableName}</td>
+          `
 
-          doc.autoTable({
-            startY: yPosition,
-            head: [['#', '姓名', '方', '葷/素', '同行']],
-            body: tableData,
-            theme: 'grid',
-            headStyles: {
-              fillColor: [66, 139, 202],
-              fontSize: 9,
-              halign: 'center'
-            },
-            bodyStyles: {
-              fontSize: 9,
-              halign: 'center'
-            },
-            columnStyles: {
-              0: { cellWidth: 10 },
-              1: { cellWidth: 50, halign: 'left' },
-              2: { cellWidth: 20 },
-              3: { cellWidth: 20 },
-              4: { cellWidth: 20 }
-            },
-            margin: { left: 15, right: 15 },
-            didDrawPage: (data) => {
-              yPosition = data.cursor.y + 5
-            }
-          })
+          // 填入賓客名字
+          for (let i = 0; i < maxGuests; i++) {
+            const guestName = table.guests[i] ? (table.guests[i].guestName || '') : ''
+            const cellStyle = guestName ? '' : 'color: #ccc;'
+            htmlContent += `<td style="border: 2px solid #333; padding: 8px; text-align: center; ${cellStyle}">${guestName || '-'}</td>`
+          }
 
-          yPosition = doc.lastAutoTable.finalY + 10
-        } else {
-          doc.setFontSize(9)
-          doc.setTextColor(150)
-          doc.text('此桌尚無賓客', 15, yPosition)
-          doc.setTextColor(0)
-          yPosition += 10
-        }
-      })
-
-      // 未安排座位
-      if (unassignedSeats.value.length > 0) {
-        if (yPosition > 220) {
-          doc.addPage()
-          yPosition = 20
-        }
-
-        doc.setFontSize(14)
-        doc.text('未安排座位', 15, yPosition)
-        yPosition += 7
-
-        const unassignedData = unassignedSeats.value.map((seat, index) => [
-          (index + 1).toString(),
-          seat.guestName,
-          getSideName(seat.side),
-          seat.mealType || '未設定',
-          seat.seatNumber > 1 ? `${seat.seatNumber}/${seat.totalSeats}` : '-'
-        ])
-
-        doc.autoTable({
-          startY: yPosition,
-          head: [['#', '姓名', '方', '葷/素', '同行']],
-          body: unassignedData,
-          theme: 'grid',
-          headStyles: {
-            fillColor: [217, 83, 79],
-            fontSize: 9,
-            halign: 'center'
-          },
-          bodyStyles: {
-            fontSize: 9,
-            halign: 'center'
-          },
-          columnStyles: {
-            0: { cellWidth: 10 },
-            1: { cellWidth: 50, halign: 'left' },
-            2: { cellWidth: 20 },
-            3: { cellWidth: 20 },
-            4: { cellWidth: 20 }
-          },
-          margin: { left: 15, right: 15 }
+          htmlContent += `</tr>`
         })
-      }
 
-      // 儲存 PDF
-      const fileName = `婚禮座位表_${new Date().toLocaleDateString('zh-TW').replace(/\//g, '')}.pdf`
-      doc.save(fileName)
+        htmlContent += `
+            </tbody>
+          </table>
+        `
+
+        container.innerHTML = htmlContent
+        document.body.appendChild(container)
+
+        // 使用 html2canvas 將 HTML 轉換為圖片
+        const canvas = await html2canvas(container, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff'
+        })
+
+        // 移除臨時容器
+        document.body.removeChild(container)
+
+        // 建立 PDF
+        const imgData = canvas.toDataURL('image/png')
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        })
+
+        const imgWidth = 210 // A4 寬度
+        const pageHeight = 297 // A4 高度
+        const imgHeight = (canvas.height * imgWidth) / canvas.width
+        let heightLeft = imgHeight
+        let position = 0
+
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+        heightLeft -= pageHeight
+
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight
+          pdf.addPage()
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+          heightLeft -= pageHeight
+        }
+
+        // 儲存 PDF
+        const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+        const fileName = `婚禮座位表_${timestamp}.pdf`
+        pdf.save(fileName)
+
+        alert('PDF匯出成功！')
+      } catch (error) {
+        console.error('PDF匯出錯誤：', error)
+        alert('PDF匯出失敗：' + error.message)
+      }
     }
 
     onMounted(async () => {
