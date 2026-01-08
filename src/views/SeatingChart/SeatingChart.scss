@@ -56,3 +56,13 @@
 .sortable-drag {
   opacity: 0.8;
 }
+
+.drag-handle {
+  color: #6c757d;
+  cursor: move;
+  font-size: 18px;
+}
+
+.drag-handle:hover {
+  color: #495057;
+}
