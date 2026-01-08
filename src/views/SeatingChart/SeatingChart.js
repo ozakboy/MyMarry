@@ -473,13 +473,13 @@ export default {
         // 建立 PDF
         const imgData = canvas.toDataURL('image/png')
         const pdf = new jsPDF({
-          orientation: 'portrait',
+          orientation: 'landscape',
           unit: 'mm',
           format: 'a4'
         })
 
-        const imgWidth = 210 // A4 寬度
-        const pageHeight = 297 // A4 高度
+        const imgWidth = 297 // A4 橫式寬度
+        const pageHeight = 210 // A4 橫式高度
         const imgHeight = (canvas.height * imgWidth) / canvas.width
         let heightLeft = imgHeight
         let position = 0
