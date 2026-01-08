@@ -394,104 +394,119 @@ export default {
 
     async function exportToPDF() {
       try {
-        // 建立臨時的 HTML 容器
-        const container = document.createElement('div')
-        container.style.position = 'absolute'
-        container.style.left = '-9999px'
-        container.style.top = '0'
-        container.style.width = '1000px'
-        container.style.backgroundColor = '#ffffff'
-        container.style.padding = '20px'
-        container.style.fontFamily = 'Microsoft YaHei, Arial, sans-serif'
-
         // 找出最多賓客的桌次數量，以決定需要多少欄位
         const maxGuests = Math.max(...tables.value.map(t => t.guests.length), 1)
 
-        // 組裝 HTML 內容 - 使用多欄位表格
-        let htmlContent = `
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="font-size: 28px; margin-bottom: 15px; font-weight: bold;">婚禮座位表</h1>
-          </div>
-          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-            <thead>
-              <tr style="background-color: #FF9999; color: #333;">
-                <th style="border: 2px solid #333; padding: 8px; text-align: center; width: 60px; font-weight: bold;">桌次</th>
-                <th style="border: 2px solid #333; padding: 8px; text-align: center; width: 100px; font-weight: bold;">桌名</th>
-        `
-
-        // 動態生成賓客欄位標題
-        for (let i = 1; i <= maxGuests; i++) {
-          htmlContent += `<th style="border: 2px solid #333; padding: 8px; text-align: center; font-weight: bold;">賓客${i}</th>`
-        }
-
-        htmlContent += `
-              </tr>
-            </thead>
-            <tbody>
-        `
-
-        // 為每個桌次生成內容
-        tables.value.forEach((table, tableIndex) => {
-          const tableNumber = `第${tableIndex + 1}桌`
-          const tableTypeText = table.tableType === 'vegetarian' ? ' (素桌)' : table.tableType === 'meat' ? ' (葷桌)' : ''
-          const tableName = table.name + tableTypeText
-
-          htmlContent += `
-            <tr style="background-color: ${tableIndex % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
-              <td style="border: 2px solid #333; padding: 8px; text-align: center; font-weight: bold;">${tableNumber}</td>
-              <td style="border: 2px solid #333; padding: 8px; text-align: center; font-weight: bold;">${tableName}</td>
-          `
-
-          // 填入賓客名字
-          for (let i = 0; i < maxGuests; i++) {
-            const guestName = table.guests[i] ? (table.guests[i].guestName || '') : ''
-            const cellStyle = guestName ? '' : 'color: #ccc;'
-            htmlContent += `<td style="border: 2px solid #333; padding: 8px; text-align: center; ${cellStyle}">${guestName || '-'}</td>`
-          }
-
-          htmlContent += `</tr>`
-        })
-
-        htmlContent += `
-            </tbody>
-          </table>
-        `
-
-        container.innerHTML = htmlContent
-        document.body.appendChild(container)
-
-        // 使用 html2canvas 將 HTML 轉換為圖片
-        const canvas = await html2canvas(container, {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: '#ffffff'
-        })
-
-        // 移除臨時容器
-        document.body.removeChild(container)
-
         // 建立 PDF
-        const imgData = canvas.toDataURL('image/png')
         const pdf = new jsPDF({
           orientation: 'landscape',
           unit: 'mm',
           format: 'a4'
         })
 
-        const imgWidth = 297 // A4 橫式寬度
-        const pageHeight = 210 // A4 橫式高度
-        const imgHeight = (canvas.height * imgWidth) / canvas.width
-        let heightLeft = imgHeight
-        let position = 0
+        const tablesPerPage = 10
+        const totalPages = Math.ceil(tables.value.length / tablesPerPage)
 
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
-        heightLeft -= pageHeight
+        // 為每一頁生成內容
+        for (let pageIndex = 0; pageIndex < totalPages; pageIndex++) {
+          if (pageIndex > 0) {
+            pdf.addPage()
+          }
 
-        while (heightLeft > 0) {
-          position = heightLeft - imgHeight
-          pdf.addPage()
-          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
-          heightLeft -= pageHeight
+          // 建立臨時的 HTML 容器
+          const container = document.createElement('div')
+          container.style.position = 'absolute'
+          container.style.left = '-9999px'
+          container.style.top = '0'
+          container.style.width = '1200px'
+          container.style.backgroundColor = '#ffffff'
+          container.style.padding = '20px'
+          container.style.fontFamily = 'Microsoft YaHei, Arial, sans-serif'
+
+          // 取得當前頁面的桌次
+          const startIndex = pageIndex * tablesPerPage
+          const endIndex = Math.min(startIndex + tablesPerPage, tables.value.length)
+          const currentPageTables = tables.value.slice(startIndex, endIndex)
+
+          // 組裝 HTML 內容
+          let htmlContent = `
+            <div style="text-align: center; margin-bottom: 20px;">
+              <h1 style="font-size: 28px; margin-bottom: 10px; font-weight: bold;">婚禮座位表</h1>
+            </div>
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+              <thead>
+                <tr style="background-color: #FF9999; color: #333;">
+                  <th style="border: 2px solid #333; padding: 8px; text-align: center; width: 60px; font-weight: bold;">桌次</th>
+                  <th style="border: 2px solid #333; padding: 8px; text-align: center; width: 100px; font-weight: bold;">桌名</th>
+          `
+
+          // 動態生成賓客欄位標題
+          for (let i = 1; i <= maxGuests; i++) {
+            htmlContent += `<th style="border: 2px solid #333; padding: 8px; text-align: center; font-weight: bold;">賓客${i}</th>`
+          }
+
+          htmlContent += `
+                </tr>
+              </thead>
+              <tbody>
+          `
+
+          // 為每個桌次生成內容
+          currentPageTables.forEach((table, relativeIndex) => {
+            const tableIndex = startIndex + relativeIndex
+            const tableNumber = `第${tableIndex + 1}桌`
+            const tableTypeText = table.tableType === 'vegetarian' ? ' (素桌)' : table.tableType === 'meat' ? ' (葷桌)' : ''
+            const tableName = table.name + tableTypeText
+
+            htmlContent += `
+              <tr style="background-color: ${relativeIndex % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
+                <td style="border: 2px solid #333; padding: 8px; text-align: center; font-weight: bold;">${tableNumber}</td>
+                <td style="border: 2px solid #333; padding: 8px; text-align: center; font-weight: bold; white-space: nowrap;">${tableName}</td>
+            `
+
+            // 填入賓客名字
+            for (let i = 0; i < maxGuests; i++) {
+              const guestName = table.guests[i] ? (table.guests[i].guestName || '') : ''
+              const cellStyle = guestName ? '' : 'color: #ccc;'
+              htmlContent += `<td style="border: 2px solid #333; padding: 8px; text-align: center; white-space: nowrap; ${cellStyle}">${guestName || '-'}</td>`
+            }
+
+            htmlContent += `</tr>`
+          })
+
+          htmlContent += `
+              </tbody>
+            </table>
+          `
+
+          container.innerHTML = htmlContent
+          document.body.appendChild(container)
+
+          // 使用 html2canvas 將 HTML 轉換為圖片
+          const canvas = await html2canvas(container, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff'
+          })
+
+          // 移除臨時容器
+          document.body.removeChild(container)
+
+          // 將圖片加入 PDF
+          const imgData = canvas.toDataURL('image/png')
+          const imgWidth = 297 // A4 橫式寬度
+          const imgHeight = (canvas.height * imgWidth) / canvas.width
+
+          // 如果圖片高度超過頁面，需要縮放
+          if (imgHeight > 210) {
+            const scale = 210 / imgHeight
+            const scaledWidth = imgWidth * scale
+            const scaledHeight = 210
+            const xOffset = (297 - scaledWidth) / 2
+            pdf.addImage(imgData, 'PNG', xOffset, 0, scaledWidth, scaledHeight)
+          } else {
+            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight)
+          }
         }
 
         // 儲存 PDF
