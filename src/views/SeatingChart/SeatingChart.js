@@ -454,7 +454,7 @@ export default {
           // 為每個桌次生成內容
           currentPageTables.forEach((table, relativeIndex) => {
             const tableIndex = startIndex + relativeIndex
-            const tableNumber = `第${tableIndex + 1}桌`
+            const tableNumber = `${tableIndex + 1}`
             const tableTypeText = table.tableType === 'vegetarian' ? ' (素桌)' : table.tableType === 'meat' ? ' (葷桌)' : ''
             const tableName = table.name + tableTypeText
 
