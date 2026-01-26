@@ -6,8 +6,11 @@
       <h2 class="mb-4">人員配置表</h2>
 
       <div class="card mb-4">
-        <div class="card-body">
+        <div class="card-body d-flex gap-2">
           <button class="btn btn-primary" @click="openAddModal">新增人員配置</button>
+          <button class="btn btn-success" @click="exportToPDF" :disabled="staffList.length === 0">
+            <i class="bi bi-file-earmark-pdf"></i> 匯出PDF
+          </button>
         </div>
       </div>
 

@@ -202,3 +202,6 @@ node server/index.js
 
 無需重新建置，直接生效！
 
+
+
+/home/ubuntu/marry/data

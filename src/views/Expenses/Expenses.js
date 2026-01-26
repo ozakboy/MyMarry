@@ -33,17 +33,50 @@ export default {
       '其他'
     ]
 
+    const payerOptions = [
+      { value: 'mutual', label: '共同' },
+      { value: 'groom', label: '新郎' },
+      { value: 'bride', label: '新娘' }
+    ]
+
+    // 確保 expense 物件含有新欄位（舊資料相容）
+    function normalizeExpense(expense) {
+      return {
+        ...expense,
+        main_payer: expense.main_payer || 'mutual',
+        sponsorships: expense.sponsorships || []
+      }
+    }
+
+    // 計算單筆贊助總額
+    function getExpenseSponsorTotal(expense) {
+      return (expense.sponsorships || []).reduce((sum, s) => sum + (s.amount || 0), 0)
+    }
+
+    // 計算單筆實付金額
+    function getExpenseActualPaid(expense) {
+      return (expense.amount || 0) - getExpenseSponsorTotal(expense)
+    }
+
     const totalExpense = computed(() => {
       return expenses.value.reduce((sum, e) => sum + (e.amount || 0), 0)
     })
 
+    const totalSponsor = computed(() => {
+      return expenses.value.reduce((sum, e) => sum + getExpenseSponsorTotal(e), 0)
+    })
+
+    const actualPaid = computed(() => {
+      return totalExpense.value - totalSponsor.value
+    })
+
     const remainingBudget = computed(() => {
-      return totalBudget.value - totalExpense.value
+      return totalBudget.value - actualPaid.value
     })
 
     const budgetPercentage = computed(() => {
       if (totalBudget.value === 0) return 0
-      return Math.round((totalExpense.value / totalBudget.value) * 100)
+      return Math.round((actualPaid.value / totalBudget.value) * 100)
     })
 
     const categoryData = computed(() => {
@@ -55,12 +88,51 @@ export default {
       return categoryMap
     })
 
+    // 支付方負擔統計
+    const payerData = computed(() => {
+      const result = { groom: 0, bride: 0, mutual: 0 }
+      expenses.value.forEach(e => {
+        const payer = e.main_payer || 'mutual'
+        const paid = getExpenseActualPaid(e)
+        if (result[payer] !== undefined) {
+          result[payer] += paid
+        } else {
+          result.mutual += paid
+        }
+      })
+      return result
+    })
+
+    // 贊助貢獻榜
+    const sponsorRanking = computed(() => {
+      const sponsorMap = {}
+      expenses.value.forEach(e => {
+        (e.sponsorships || []).forEach(s => {
+          const name = s.name || '未知'
+          sponsorMap[name] = (sponsorMap[name] || 0) + (s.amount || 0)
+        })
+      })
+      return Object.entries(sponsorMap)
+        .map(([name, amount]) => ({ name, amount }))
+        .sort((a, b) => b.amount - a.amount)
+    })
+
+    // 編輯中花費的贊助總額（即時計算）
+    const editingSponsorTotal = computed(() => {
+      return (editingExpense.value.sponsorships || []).reduce((sum, s) => sum + (s.amount || 0), 0)
+    })
+
+    const editingActualPaid = computed(() => {
+      return (editingExpense.value.amount || 0) - editingSponsorTotal.value
+    })
+
     async function loadExpenses() {
       try {
         const response = await fetch('/api/expenses')
         if (response.ok) {
           const data = await response.json()
-          expenses.value = data.expenses || []
+          // 為舊資料補上預設值
+          expenses.value = (data.expenses || []).map(normalizeExpense)
           totalBudget.value = data.totalBudget || 0
         }
       } catch (error) {
@@ -101,6 +173,8 @@ export default {
         item: '',
         amount: 0,
         date: new Date().toISOString().split('T')[0],
+        main_payer: 'mutual',
+        sponsorships: [],
         note: ''
       }
       customCategory.value = ''
@@ -109,9 +183,26 @@ export default {
 
     function openEditModal(expense) {
       isEditing.value = true
-      editingExpense.value = { ...expense }
+      editingExpense.value = normalizeExpense({ ...expense })
+      // 深拷貝 sponsorships 避免引用問題
+      editingExpense.value.sponsorships = (expense.sponsorships || []).map(s => ({ ...s }))
       customCategory.value = ''
       expenseModalInstance.show()
+    }
+
+    function addSponsorship() {
+      if (!editingExpense.value.sponsorships) {
+        editingExpense.value.sponsorships = []
+      }
+      editingExpense.value.sponsorships.push({
+        id: 's' + Date.now(),
+        name: '',
+        amount: 0
+      })
+    }
+
+    function removeSponsorship(index) {
+      editingExpense.value.sponsorships.splice(index, 1)
     }
 
     async function saveExpense() {
@@ -164,6 +255,11 @@ export default {
         console.error('刪除花費失敗：', error)
         alert('刪除花費失敗')
       }
+    }
+
+    function getPayerLabel(payer) {
+      const found = payerOptions.find(p => p.value === payer)
+      return found ? found.label : '共同'
     }
 
     function updateChart() {
@@ -241,12 +337,24 @@ export default {
       chartCanvas,
       categories,
       totalExpense,
+      totalSponsor,
+      actualPaid,
       categoryData,
+      payerOptions,
+      payerData,
+      sponsorRanking,
+      editingSponsorTotal,
+      editingActualPaid,
+      getExpenseSponsorTotal,
+      getExpenseActualPaid,
+      getPayerLabel,
       loadExpenses,
       openBudgetModal,
       saveBudget,
       openAddModal,
       openEditModal,
+      addSponsorship,
+      removeSponsorship,
       saveExpense,
       deleteExpense,
       updateChart
