@@ -11,6 +11,7 @@ export default {
     const sideFilter = ref('all')
     const editingResponse = ref({})
     const newGuest = ref({})
+    const defaultCookieCount = ref(1)
     let editGiftModalInstance = null
     let addGuestModalInstance = null
 
@@ -65,6 +66,18 @@ export default {
       return responses.value.filter(r => r.side === 'bride').length
     })
 
+    async function loadConfig() {
+      try {
+        const response = await fetch('/api/config')
+        if (response.ok) {
+          const config = await response.json()
+          defaultCookieCount.value = config.defaultCookieCount ?? 1
+        }
+      } catch (error) {
+        console.error('載入設定失敗：', error)
+      }
+    }
+
     async function loadResponses() {
       try {
         const response = await fetch('/api/responses')
@@ -100,6 +113,28 @@ export default {
       } catch (error) {
         console.error('更新禮金失敗：', error)
         alert('更新禮金失敗')
+      }
+    }
+
+    async function toggleCookieGiven(response) {
+      const updated = { ...response, cookieGiven: !response.cookieGiven }
+      try {
+        const res = await fetch(`/api/responses/${response.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updated)
+        })
+
+        if (res.ok) {
+          await loadResponses()
+        } else {
+          alert('更新失敗')
+        }
+      } catch (error) {
+        console.error('更新喜餅給予狀態失敗：', error)
+        alert('更新失敗')
       }
     }
 
@@ -177,6 +212,7 @@ export default {
     }
 
     onMounted(async () => {
+      await loadConfig()
       await loadResponses()
       const modalElement = document.getElementById('editGiftModal')
       if (modalElement) {
@@ -194,6 +230,7 @@ export default {
       sideFilter,
       editingResponse,
       newGuest,
+      defaultCookieCount,
       filteredResponses,
       totalGiftMoney,
       groomGiftMoney,
@@ -203,6 +240,7 @@ export default {
       relationshipOptions,
       openEditGiftModal,
       saveGiftMoney,
+      toggleCookieGiven,
       openAddGuestModal,
       saveNewGuest
     }

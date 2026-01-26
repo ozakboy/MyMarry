@@ -89,6 +89,8 @@
                   <th>用餐類型</th>
                   <th>兒童座椅</th>
                   <th>禮金</th>
+                  <th>喜餅數量</th>
+                  <th>已給予</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -109,12 +111,32 @@
                   <td>{{ response.childSeatCount }}</td>
                   <td class="fw-bold">${{ (response.giftMoney || 0).toLocaleString() }}</td>
                   <td>
-                    <button
-                      class="btn btn-sm btn-outline-primary"
-                      @click="openEditGiftModal(response)"
+                    <span class="badge bg-info">{{ response.cookieCount != null ? response.cookieCount : defaultCookieCount }}</span>
+                  </td>
+                  <td>
+                    <span
+                      class="badge"
+                      :class="response.cookieGiven ? 'bg-success' : 'bg-secondary'"
                     >
-                      編輯禮金
-                    </button>
+                      {{ response.cookieGiven ? '已給予' : '未給予' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <button
+                        class="btn btn-sm btn-outline-primary"
+                        @click="openEditGiftModal(response)"
+                      >
+                        編輯禮金
+                      </button>
+                      <button
+                        class="btn btn-sm"
+                        :class="response.cookieGiven ? 'btn-outline-secondary' : 'btn-outline-success'"
+                        @click="toggleCookieGiven(response)"
+                      >
+                        {{ response.cookieGiven ? '取消給予' : '給予喜餅' }}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               </tbody>
