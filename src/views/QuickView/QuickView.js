@@ -10,7 +10,18 @@ export default {
     const searchQuery = ref('')
     const sideFilter = ref('all')
     const editingResponse = ref({})
+    const newGuest = ref({})
     let editGiftModalInstance = null
+    let addGuestModalInstance = null
+
+    const relationshipOptions = [
+      '家人',
+      '親戚',
+      '同事',
+      '同學',
+      '朋友',
+      '其他'
+    ]
 
     const filteredResponses = computed(() => {
       let filtered = responses.value
@@ -92,11 +103,88 @@ export default {
       }
     }
 
+    function resetNewGuest() {
+      newGuest.value = {
+        name: '',
+        phone: '',
+        relationship: '朋友',
+        customRelationship: '',
+        side: 'groom',
+        willAttend: 'yes',
+        attendees: 1,
+        mealType: '葷食',
+        needChildSeat: 'no',
+        childSeatCount: 0,
+        giftMoney: 0,
+        note: ''
+      }
+    }
+
+    function openAddGuestModal() {
+      resetNewGuest()
+      addGuestModalInstance.show()
+    }
+
+    async function saveNewGuest() {
+      if (!newGuest.value.name.trim()) {
+        alert('請輸入姓名')
+        return
+      }
+
+      const finalRelationship = newGuest.value.relationship === '其他' && newGuest.value.customRelationship
+        ? newGuest.value.customRelationship
+        : newGuest.value.relationship
+
+      const dataToSubmit = {
+        name: newGuest.value.name,
+        phone: newGuest.value.phone,
+        relationship: finalRelationship,
+        side: newGuest.value.side,
+        willAttend: newGuest.value.willAttend,
+        attendees: newGuest.value.willAttend === 'yes' ? newGuest.value.attendees : 0,
+        mealType: newGuest.value.willAttend === 'yes' ? newGuest.value.mealType : '',
+        needChildSeat: newGuest.value.willAttend === 'yes' ? newGuest.value.needChildSeat : 'no',
+        childSeatCount: newGuest.value.willAttend === 'yes' && newGuest.value.needChildSeat === 'yes' ? newGuest.value.childSeatCount : 0,
+        needInvitation: 'no',
+        invitationRecipient: '',
+        invitationAddress: '',
+        invitationPhone: '',
+        blessing: '',
+        giftMoney: newGuest.value.giftMoney || 0,
+        note: newGuest.value.note
+      }
+
+      try {
+        const response = await fetch('/api/responses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          },
+          body: JSON.stringify(dataToSubmit)
+        })
+
+        if (response.ok) {
+          await loadResponses()
+          addGuestModalInstance.hide()
+          alert('來賓新增成功')
+        } else {
+          throw new Error('新增失敗')
+        }
+      } catch (error) {
+        console.error('新增來賓失敗：', error)
+        alert('新增來賓失敗')
+      }
+    }
+
     onMounted(async () => {
       await loadResponses()
       const modalElement = document.getElementById('editGiftModal')
       if (modalElement) {
         editGiftModalInstance = new Modal(modalElement)
+      }
+      const addGuestModalElement = document.getElementById('addGuestModal')
+      if (addGuestModalElement) {
+        addGuestModalInstance = new Modal(addGuestModalElement)
       }
     })
 
@@ -105,14 +193,18 @@ export default {
       searchQuery,
       sideFilter,
       editingResponse,
+      newGuest,
       filteredResponses,
       totalGiftMoney,
       groomGiftMoney,
       brideGiftMoney,
       groomCount,
       brideCount,
+      relationshipOptions,
       openEditGiftModal,
-      saveGiftMoney
+      saveGiftMoney,
+      openAddGuestModal,
+      saveNewGuest
     }
   }
 }

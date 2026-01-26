@@ -7,8 +7,18 @@ export default {
   setup() {
     const responses = ref([])
     const editingResponse = ref(null)
+    const addingGuest = ref(null)
     const filter = ref('all')
     const defaultCookieCount = ref(1)
+
+    const relationshipOptions = [
+      '家人',
+      '親戚',
+      '同事',
+      '同學',
+      '朋友',
+      '其他'
+    ]
 
     // 篩選後的資料
     const filteredResponses = computed(() => {
@@ -205,6 +215,79 @@ export default {
       }
     }
 
+    // 快速新增來賓
+    const openAddGuest = () => {
+      addingGuest.value = {
+        name: '',
+        phone: '',
+        relationship: '朋友',
+        customRelationship: '',
+        side: 'groom',
+        willAttend: 'yes',
+        attendees: 1,
+        mealType: '葷食',
+        needChildSeat: 'no',
+        childSeatCount: 0,
+        giftMoney: 0,
+        note: ''
+      }
+    }
+
+    const cancelAddGuest = () => {
+      addingGuest.value = null
+    }
+
+    const saveAddGuest = async () => {
+      if (!addingGuest.value.name.trim()) {
+        alert('請輸入姓名')
+        return
+      }
+
+      const finalRelationship = addingGuest.value.relationship === '其他' && addingGuest.value.customRelationship
+        ? addingGuest.value.customRelationship
+        : addingGuest.value.relationship
+
+      const dataToSubmit = {
+        name: addingGuest.value.name,
+        phone: addingGuest.value.phone,
+        relationship: finalRelationship,
+        side: addingGuest.value.side,
+        willAttend: addingGuest.value.willAttend,
+        attendees: addingGuest.value.willAttend === 'yes' ? addingGuest.value.attendees : 0,
+        mealType: addingGuest.value.willAttend === 'yes' ? addingGuest.value.mealType : '',
+        needChildSeat: addingGuest.value.willAttend === 'yes' ? addingGuest.value.needChildSeat : 'no',
+        childSeatCount: addingGuest.value.willAttend === 'yes' && addingGuest.value.needChildSeat === 'yes' ? addingGuest.value.childSeatCount : 0,
+        needInvitation: 'no',
+        invitationRecipient: '',
+        invitationAddress: '',
+        invitationPhone: '',
+        blessing: '',
+        giftMoney: addingGuest.value.giftMoney || 0,
+        note: addingGuest.value.note
+      }
+
+      try {
+        const response = await fetch('/api/responses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+          },
+          body: JSON.stringify(dataToSubmit)
+        })
+
+        if (response.ok) {
+          await loadResponses()
+          addingGuest.value = null
+          alert('來賓新增成功')
+        } else {
+          throw new Error('新增失敗')
+        }
+      } catch (error) {
+        console.error('新增來賓失敗：', error)
+        alert('新增來賓失敗')
+      }
+    }
+
     onMounted(() => {
       loadResponses()
     })
@@ -212,8 +295,10 @@ export default {
     return {
       responses,
       editingResponse,
+      addingGuest,
       filter,
       defaultCookieCount,
+      relationshipOptions,
       filteredResponses,
       attendanceStats,
       totalAttendees,
@@ -230,7 +315,10 @@ export default {
       editResponse,
       cancelEdit,
       saveEdit,
-      deleteResponse
+      deleteResponse,
+      openAddGuest,
+      cancelAddGuest,
+      saveAddGuest
     }
   }
 }

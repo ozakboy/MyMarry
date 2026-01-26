@@ -11,8 +11,11 @@
             <div class="card-body p-3 p-sm-4 p-md-5">
               <!-- 標題和篩選器 -->
               <div class="mb-3 mb-md-4">
-                <div class="mb-3">
+                <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                   <h2 class="fw-bold mb-0" style="color: #d4357f;">📊 出席回覆管理</h2>
+                  <button class="btn btn-primary" @click="openAddGuest">
+                    <i class="bi bi-person-plus me-1"></i>快速新增來賓
+                  </button>
                 </div>
 
                 <!-- 快速篩選 -->
@@ -455,6 +458,91 @@
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" @click="cancelEdit">取消</button>
             <button type="button" class="btn btn-primary" @click="saveEdit">儲存變更</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 快速新增來賓對話框 -->
+    <div v-if="addingGuest" class="modal d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">快速新增來賓</h5>
+            <button type="button" class="btn-close" @click="cancelAddGuest"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold">姓名 <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" v-model="addingGuest.name" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">電話</label>
+                <input type="tel" class="form-control" v-model="addingGuest.phone">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">關係</label>
+                <select class="form-select" v-model="addingGuest.relationship">
+                  <option v-for="rel in relationshipOptions" :key="rel" :value="rel">{{ rel }}</option>
+                </select>
+              </div>
+              <div class="col-md-6" v-if="addingGuest.relationship === '其他'">
+                <label class="form-label fw-bold">自訂關係</label>
+                <input type="text" class="form-control" v-model="addingGuest.customRelationship">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">賓客屬性</label>
+                <select class="form-select" v-model="addingGuest.side">
+                  <option value="groom">🤵 男方</option>
+                  <option value="bride">👰 女方</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">是否出席</label>
+                <select class="form-select" v-model="addingGuest.willAttend">
+                  <option value="yes">✅ 出席</option>
+                  <option value="no">❌ 不出席</option>
+                </select>
+              </div>
+              <div class="col-md-6" v-if="addingGuest.willAttend === 'yes'">
+                <label class="form-label fw-bold">出席人數</label>
+                <input type="number" class="form-control" v-model.number="addingGuest.attendees" min="1" max="20">
+              </div>
+              <div class="col-md-6" v-if="addingGuest.willAttend === 'yes'">
+                <label class="form-label fw-bold">用餐類型</label>
+                <select class="form-select" v-model="addingGuest.mealType">
+                  <option value="葷食">葷食</option>
+                  <option value="素食">素食</option>
+                </select>
+              </div>
+              <div class="col-md-6" v-if="addingGuest.willAttend === 'yes'">
+                <label class="form-label fw-bold">兒童座椅</label>
+                <select class="form-select" v-model="addingGuest.needChildSeat">
+                  <option value="no">不需要</option>
+                  <option value="yes">需要</option>
+                </select>
+              </div>
+              <div class="col-md-6" v-if="addingGuest.willAttend === 'yes' && addingGuest.needChildSeat === 'yes'">
+                <label class="form-label fw-bold">座椅數量</label>
+                <input type="number" class="form-control" v-model.number="addingGuest.childSeatCount" min="1">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold">禮金</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" class="form-control" v-model.number="addingGuest.giftMoney" min="0" step="100">
+                </div>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-bold">備註</label>
+                <textarea class="form-control" v-model="addingGuest.note" rows="2"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="cancelAddGuest">取消</button>
+            <button type="button" class="btn btn-primary" @click="saveAddGuest">新增</button>
           </div>
         </div>
       </div>
