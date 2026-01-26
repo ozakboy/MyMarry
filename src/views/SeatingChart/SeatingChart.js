@@ -16,6 +16,9 @@ export default {
     const editingTableIndex = ref(null)
     const editingTableName = ref('')
     const editingTableType = ref('')
+    const floorPlanImage = ref('')
+    const showFloorPlan = ref(true)
+    const floorPlanFileInput = ref(null)
     let assignModalInstance = null
     let editTableModalInstance = null
     let seatsPerTable = 10
@@ -130,6 +133,12 @@ export default {
         const response = await fetch('/api/seating')
         if (response.ok) {
           const data = await response.json()
+
+          // 載入場地平面圖
+          if (data.floorPlanImage) {
+            floorPlanImage.value = data.floorPlanImage
+          }
+
           if (data.tables && data.tables.length > 0) {
             // 為每個桌次添加 id 並修補缺少的 mealType
             tables.value = data.tables.map((table, index) => {
@@ -367,7 +376,8 @@ export default {
       try {
         const data = {
           tables: tables.value,
-          unassigned: unassignedGuests.value.map(g => g.id)
+          unassigned: unassignedGuests.value.map(g => g.id),
+          floorPlanImage: floorPlanImage.value || ''
         }
 
         const response = await fetch('/api/seating', {
@@ -521,6 +531,46 @@ export default {
       }
     }
 
+    function triggerFloorPlanUpload() {
+      if (floorPlanFileInput.value) {
+        floorPlanFileInput.value.click()
+      }
+    }
+
+    function handleFloorPlanUpload(event) {
+      const file = event.target.files[0]
+      if (!file) return
+
+      if (!file.type.startsWith('image/')) {
+        alert('請選擇圖片檔案')
+        return
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        alert('圖片檔案大小不可超過 5MB')
+        return
+      }
+
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        floorPlanImage.value = e.target.result
+        showFloorPlan.value = true
+      }
+      reader.readAsDataURL(file)
+
+      // 重置 input 讓同一檔案可以重新上傳
+      event.target.value = ''
+    }
+
+    function removeFloorPlan() {
+      if (!confirm('確定要移除場地平面圖嗎？')) return
+      floorPlanImage.value = ''
+    }
+
+    function toggleFloorPlan() {
+      showFloorPlan.value = !showFloorPlan.value
+    }
+
     onMounted(async () => {
       await loadConfig()
       await loadResponses()
@@ -545,6 +595,9 @@ export default {
       editingTableIndex,
       editingTableName,
       editingTableType,
+      floorPlanImage,
+      showFloorPlan,
+      floorPlanFileInput,
       unassignedGuests,
       unassignedSeats,
       unassignedGuestsList,
@@ -567,7 +620,11 @@ export default {
       autoArrange,
       saveSeating,
       onTableReorder,
-      exportToPDF
+      exportToPDF,
+      triggerFloorPlanUpload,
+      handleFloorPlanUpload,
+      removeFloorPlan,
+      toggleFloorPlan
     }
   }
 }

@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 4600
 
 // 中介軟體
 app.use(cors())
-app.use(express.json({ charset: 'utf-8' }))
+app.use(express.json({ charset: 'utf-8', limit: '10mb' }))
 
 // JSON 資料檔案路徑
 const dataFile = process.env.NODE_ENV === 'production'

@@ -11,7 +11,34 @@
             <div class="card-body">
               <button class="btn btn-primary w-100 mb-2" @click="addTable">新增桌次</button>
               <button class="btn btn-success w-100 mb-2" @click="autoArrange">自動安排</button>
-              <button class="btn btn-info w-100" @click="saveSeating">儲存座位表</button>
+              <button class="btn btn-info w-100 mb-2" @click="saveSeating">儲存座位表</button>
+              <hr>
+              <button class="btn btn-outline-secondary w-100 mb-2" @click="triggerFloorPlanUpload">
+                <i class="bi bi-image me-1"></i>{{ floorPlanImage ? '更換場地圖' : '上傳場地圖' }}
+              </button>
+              <input
+                type="file"
+                ref="floorPlanFileInput"
+                accept="image/*"
+                style="display: none;"
+                @change="handleFloorPlanUpload"
+              >
+              <button
+                v-if="floorPlanImage"
+                class="btn w-100 mb-2"
+                :class="showFloorPlan ? 'btn-outline-primary' : 'btn-primary'"
+                @click="toggleFloorPlan"
+              >
+                <i class="bi me-1" :class="showFloorPlan ? 'bi-eye-slash' : 'bi-eye'"></i>
+                {{ showFloorPlan ? '隱藏場地圖' : '顯示場地圖' }}
+              </button>
+              <button
+                v-if="floorPlanImage"
+                class="btn btn-outline-danger w-100"
+                @click="removeFloorPlan"
+              >
+                <i class="bi bi-trash me-1"></i>移除場地圖
+              </button>
             </div>
           </div>
 
@@ -57,6 +84,26 @@
               <i class="bi bi-file-earmark-pdf me-1"></i>匯出 PDF
             </button>
           </div>
+
+          <!-- 場地平面圖 -->
+          <div v-if="floorPlanImage && showFloorPlan" class="floor-plan-container mb-4">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-map me-1"></i>場地平面圖</h6>
+                <button class="btn btn-sm btn-outline-secondary" @click="toggleFloorPlan">
+                  <i class="bi bi-eye-slash"></i> 隱藏
+                </button>
+              </div>
+              <div class="card-body p-2">
+                <img
+                  :src="floorPlanImage"
+                  alt="場地平面圖"
+                  class="floor-plan-img"
+                >
+              </div>
+            </div>
+          </div>
+
           <draggable
             :list="tables"
             item-key="id"
