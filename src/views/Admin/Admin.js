@@ -77,7 +77,8 @@ export default {
     const totalCookies = computed(() => {
       return responses.value.reduce((sum, r) => {
         if (r.willAttend === 'yes') {
-          return sum + (r.cookieCount || defaultCookieCount.value)
+          const count = (r.cookieCount != null) ? r.cookieCount : defaultCookieCount.value
+          return sum + count
         }
         return sum
       }, 0)
@@ -146,6 +147,19 @@ export default {
 
       return stats
     })
+
+    // 載入設定
+    const loadConfig = async () => {
+      try {
+        const response = await fetch('/api/config')
+        if (response.ok) {
+          const config = await response.json()
+          defaultCookieCount.value = config.defaultCookieCount ?? 1
+        }
+      } catch (error) {
+        console.error('載入設定錯誤：', error)
+      }
+    }
 
     // 載入資料
     const loadResponses = async () => {
@@ -228,6 +242,7 @@ export default {
         mealType: '葷食',
         needChildSeat: 'no',
         childSeatCount: 0,
+        cookieCount: defaultCookieCount.value,
         giftMoney: 0,
         note: ''
       }
@@ -257,6 +272,7 @@ export default {
         mealType: addingGuest.value.willAttend === 'yes' ? addingGuest.value.mealType : '',
         needChildSeat: addingGuest.value.willAttend === 'yes' ? addingGuest.value.needChildSeat : 'no',
         childSeatCount: addingGuest.value.willAttend === 'yes' && addingGuest.value.needChildSeat === 'yes' ? addingGuest.value.childSeatCount : 0,
+        cookieCount: addingGuest.value.willAttend === 'yes' ? (addingGuest.value.cookieCount ?? defaultCookieCount.value) : 0,
         needInvitation: 'no',
         invitationRecipient: '',
         invitationAddress: '',
@@ -288,8 +304,9 @@ export default {
       }
     }
 
-    onMounted(() => {
-      loadResponses()
+    onMounted(async () => {
+      await loadConfig()
+      await loadResponses()
     })
 
     return {

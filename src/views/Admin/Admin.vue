@@ -258,7 +258,7 @@
                         <span v-else class="text-muted">-</span>
                       </td>
                       <td>
-                        <span class="badge bg-info">{{ response.cookieCount || defaultCookieCount }}</span>
+                        <span class="badge bg-info">{{ response.cookieCount != null ? response.cookieCount : defaultCookieCount }}</span>
                       </td>
                       <td>
                         <div v-if="response.needInvitation === 'yes'">
@@ -316,7 +316,7 @@
                         <div><strong>餐點：</strong>{{ response.mealType }}</div>
                         <div><strong>兒童座椅：</strong>{{ response.needChildSeat === 'yes' ? `需要 ${response.childSeatCount}張` : '不需要' }}</div>
                         <div v-if="response.giftMoney"><strong>禮金：</strong><span class="text-success fw-bold">${{ response.giftMoney.toLocaleString() }}</span></div>
-                        <div><strong>喜餅：</strong>{{ response.cookieCount || defaultCookieCount }}個</div>
+                        <div><strong>喜餅：</strong>{{ response.cookieCount != null ? response.cookieCount : defaultCookieCount }}個</div>
                       </small>
                     </div>
 
@@ -526,6 +526,10 @@
               <div class="col-md-6" v-if="addingGuest.willAttend === 'yes' && addingGuest.needChildSeat === 'yes'">
                 <label class="form-label fw-bold">座椅數量</label>
                 <input type="number" class="form-control" v-model.number="addingGuest.childSeatCount" min="1">
+              </div>
+              <div class="col-md-6" v-if="addingGuest.willAttend === 'yes'">
+                <label class="form-label fw-bold">喜餅數量</label>
+                <input type="number" class="form-control" v-model.number="addingGuest.cookieCount" min="0" step="1" :placeholder="`預設 ${defaultCookieCount}`">
               </div>
               <div class="col-md-6">
                 <label class="form-label fw-bold">禮金</label>
